@@ -5,7 +5,7 @@
 * to understand the I2C protocol and communicate with a
 * a I2C Slave device (LIS3DH Accelerometer).
 *
-* \author Gabriele Belotti
+* \author Manuel Carzaniga 
 * \date , 2020
 */
 
@@ -278,13 +278,12 @@ int main(void)
     for(;;)
     {
         CyDelay(100);
-        error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
-                                            LIS3DH_OUT_ADC_3L,
-                                            &TemperatureData[0]);
         
-        error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
-                                            LIS3DH_OUT_ADC_3H,
-                                            &TemperatureData[1]);
+        error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,
+                                                LIS3DH_OUT_ADC_3L,
+                                                2,
+                                                &TemperatureData[0]);
+        
         if(error == NO_ERROR)
         {
             OutTemp = (int16)((TemperatureData[0] | (TemperatureData[1]<<8)))>>6;
