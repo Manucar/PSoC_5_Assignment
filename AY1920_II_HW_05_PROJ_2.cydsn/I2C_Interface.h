@@ -15,6 +15,68 @@
     
     #include "cytypes.h"
     #include "ErrorCodes.h"
+    #include "project.h"
+    
+    /**
+    *   \brief 7-bit I2C address of the slave device.
+    */
+    #define LIS3DH_DEVICE_ADDRESS 0x18
+
+    /**
+    *   \brief Address of the WHO AM I register
+    */
+    #define LIS3DH_WHO_AM_I_REG_ADDR 0x0F
+
+    /**
+    *   \brief Address of the Status register
+    */
+    #define LIS3DH_STATUS_REG 0x27
+
+    /**
+    *   \brief Address of the Control register 1
+    */
+    #define LIS3DH_CTRL_REG1 0x20
+
+    /**
+    *   \brief Hex value to set normal mode to the accelerator and 100HZ data rate
+    */
+    #define LIS3DH_NORMAL_MODE_CTRL_REG1 0x57
+
+    /**
+    *   \brief Address of the Control register 4
+    */
+    #define LIS3DH_CTRL_REG4 0x23
+    
+    /**
+    *   \brief Hex value to set output registers not updated until MSB and LSB reading and FSR +-2g
+    */
+    #define LIS3DH_CTRL_REG4_BDU_ACTIVE 0x80
+    
+    /**
+    *   \brief Address of the X axis output LSB register
+    */
+    #define LIS3DH_OUT_X_L 0x28
+    
+    /**
+    *   \brief Address of the Y axis output LSB register
+    */
+    #define LIS3DH_OUT_Y_L 0x2A
+    
+    /**
+    *   \brief Address of the Z axis output LSB register
+    */
+    #define LIS3DH_OUT_Z_L 0x2C
+    
+    /**
+    *   \brief Number of registers to be read/write with the appropriate functions
+    */
+    #define REGISTER_COUNT 6
+    
+    /**
+    *   \brief Mask for the status register in order to check if data available
+    */
+    #define STATUS_REG_MASK 0x08 // 00001000 mask
+
     
     /** \brief Start the I2C peripheral.
     *   
