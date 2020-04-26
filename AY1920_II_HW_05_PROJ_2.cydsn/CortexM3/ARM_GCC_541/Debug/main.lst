@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 1
 
 
    1              		.syntax unified
@@ -29,24 +29,21 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
   26              	.LFB64:
   27              		.file 1 "main.c"
    1:main.c        **** /**
-   2:main.c        **** * \brief Main source file for the I2C-Master project.
+   2:main.c        **** * Main source file for the I2C-Master project.
    3:main.c        **** *
    4:main.c        **** * In this main code file there is the set up of a I2C master device
-   5:main.c        **** * and communicate with the I2C Slave device (LIS3DH Accelerometer).
+   5:main.c        **** * and the communication with the I2C Slave device (LIS3DH Accelerometer).
    6:main.c        **** *
-   7:main.c        **** * \author Manuel Carzaniga 
-   8:main.c        **** * \date , 2020
-   9:main.c        **** */
-  10:main.c        **** 
-  11:main.c        **** // Include required header files
+   7:main.c        **** */
+   8:main.c        **** 
+   9:main.c        **** // Include required header files
+  10:main.c        **** #include "InterruptRoutines.h"
+  11:main.c        **** #include "stdio.h"
   12:main.c        **** 
-  13:main.c        **** #include "InterruptRoutines.h"
-  14:main.c        **** #include "stdio.h"
-  15:main.c        **** 
-  16:main.c        **** 
-  17:main.c        **** int main(void)
-  18:main.c        **** {
-  28              		.loc 1 18 0
+  13:main.c        **** 
+  14:main.c        **** int main(void)
+  15:main.c        **** {
+  28              		.loc 1 15 0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 56
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -56,496 +53,494 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
   35              		.cfi_offset 14, -4
   36 0002 8EB0     		sub	sp, sp, #56
   37              		.cfi_def_cfa_offset 64
-  19:main.c        ****     CyGlobalIntEnable; /* Enable global interrupts. */
-  38              		.loc 1 19 0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 2
-
-
+  16:main.c        ****     CyGlobalIntEnable; /* Enable global interrupts. */
+  38              		.loc 1 16 0
   39              		.syntax unified
-  40              	@ 19 "main.c" 1
+  40              	@ 16 "main.c" 1
   41 0004 62B6     		CPSIE   i
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 2
+
+
   42              	@ 0 "" 2
-  20:main.c        **** 
-  21:main.c        ****     /* Place your initialization/startup code here (e.g. MyInst_Start()) */
-  22:main.c        ****     I2C_Peripheral_Start();
-  43              		.loc 1 22 0
+  17:main.c        **** 
+  18:main.c        ****     I2C_Peripheral_Start();
+  43              		.loc 1 18 0
   44              		.thumb
   45              		.syntax unified
   46 0006 FFF7FEFF 		bl	I2C_Peripheral_Start
   47              	.LVL0:
-  23:main.c        ****     UART_Debug_Start();
-  48              		.loc 1 23 0
+  19:main.c        ****     UART_Debug_Start();
+  48              		.loc 1 19 0
   49 000a FFF7FEFF 		bl	UART_Debug_Start
   50              	.LVL1:
-  24:main.c        ****     
-  25:main.c        ****     
-  26:main.c        ****     CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
-  51              		.loc 1 26 0
+  20:main.c        ****     
+  21:main.c        ****     
+  22:main.c        ****     CyDelay(5); //"The boot procedure is complete about 5 milliseconds after device power-up."
+  51              		.loc 1 22 0
   52 000e 0520     		movs	r0, #5
   53 0010 FFF7FEFF 		bl	CyDelay
   54              	.LVL2:
   55              	.LBB2:
-  27:main.c        ****     
-  28:main.c        ****     // String to print out messages on the UART
-  29:main.c        ****     char message[50];
-  30:main.c        **** 
-  31:main.c        ****     // Check which devices are present on the I2C bus
-  32:main.c        ****     for (int i = 0 ; i < 128; i++)
-  56              		.loc 1 32 0
+  23:main.c        ****     
+  24:main.c        ****     // String to print out messages on the UART
+  25:main.c        ****     char message[50];
+  26:main.c        **** 
+  27:main.c        ****     // Check which devices are present on the I2C bus
+  28:main.c        ****     for (int i = 0 ; i < 128; i++)
+  56              		.loc 1 28 0
   57 0014 0024     		movs	r4, #0
   58 0016 0CE0     		b	.L2
   59              	.LVL3:
   60              	.L4:
-  33:main.c        ****     {
-  34:main.c        ****         if (I2C_Peripheral_IsDeviceConnected(i))
-  61              		.loc 1 34 0
+  29:main.c        ****     {
+  30:main.c        ****         if (I2C_Peripheral_IsDeviceConnected(i))
+  61              		.loc 1 30 0
   62 0018 E0B2     		uxtb	r0, r4
   63 001a FFF7FEFF 		bl	I2C_Peripheral_IsDeviceConnected
   64              	.LVL4:
   65 001e 38B1     		cbz	r0, .L3
-  35:main.c        ****         {
-  36:main.c        ****             // print out the address is hex format
-  37:main.c        ****             sprintf(message, "Device 0x%02X is connected\r\n", i);
-  66              		.loc 1 37 0
+  31:main.c        ****         {
+  32:main.c        ****             // print out the address is hex format
+  33:main.c        ****             sprintf(message, "Device 0x%02X is connected\r\n", i);
+  66              		.loc 1 33 0
   67 0020 2246     		mov	r2, r4
   68 0022 5749     		ldr	r1, .L21
   69 0024 01A8     		add	r0, sp, #4
   70 0026 FFF7FEFF 		bl	sprintf
   71              	.LVL5:
-  38:main.c        ****             UART_Debug_PutString(message); 
-  72              		.loc 1 38 0
+  34:main.c        ****             UART_Debug_PutString(message); 
+  72              		.loc 1 34 0
   73 002a 01A8     		add	r0, sp, #4
   74 002c FFF7FEFF 		bl	UART_Debug_PutString
   75              	.LVL6:
   76              	.L3:
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 3
-
-
-  32:main.c        ****     {
-  77              		.loc 1 32 0 discriminator 2
+  28:main.c        ****     {
+  77              		.loc 1 28 0 discriminator 2
   78 0030 0134     		adds	r4, r4, #1
   79              	.LVL7:
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 3
+
+
   80              	.L2:
-  32:main.c        ****     {
-  81              		.loc 1 32 0 is_stmt 0 discriminator 1
+  28:main.c        ****     {
+  81              		.loc 1 28 0 is_stmt 0 discriminator 1
   82 0032 7F2C     		cmp	r4, #127
   83 0034 F0DD     		ble	.L4
   84              	.LBE2:
-  39:main.c        ****         }
-  40:main.c        ****         
-  41:main.c        ****     }
+  35:main.c        ****         }
+  36:main.c        ****         
+  37:main.c        ****     }
+  38:main.c        ****     
+  39:main.c        ****     /******************************************/
+  40:main.c        ****     /*            I2C Reading                 */
+  41:main.c        ****     /******************************************/
   42:main.c        ****     
-  43:main.c        ****     /******************************************/
-  44:main.c        ****     /*            I2C Reading                 */
-  45:main.c        ****     /******************************************/
-  46:main.c        ****     
-  47:main.c        ****     /* Read WHO AM I REGISTER register */
-  48:main.c        ****     uint8_t who_am_i_reg;
-  49:main.c        ****     ErrorCode error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
-  85              		.loc 1 49 0 is_stmt 1
+  43:main.c        ****     /* Read WHO AM I REGISTER register */
+  44:main.c        ****     uint8_t who_am_i_reg;
+  45:main.c        ****     ErrorCode error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+  85              		.loc 1 45 0 is_stmt 1
   86 0036 0DF10302 		add	r2, sp, #3
   87 003a 0F21     		movs	r1, #15
   88 003c 1820     		movs	r0, #24
   89 003e FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
   90              	.LVL8:
-  50:main.c        ****                                                   LIS3DH_WHO_AM_I_REG_ADDR, 
-  51:main.c        ****                                                   &who_am_i_reg);
-  52:main.c        ****     if (error == NO_ERROR)
-  91              		.loc 1 52 0
+  46:main.c        ****                                                   LIS3DH_WHO_AM_I_REG_ADDR, 
+  47:main.c        ****                                                   &who_am_i_reg);
+  48:main.c        ****     if (error == NO_ERROR)
+  91              		.loc 1 48 0
   92 0042 48B9     		cbnz	r0, .L5
-  53:main.c        ****     {
-  54:main.c        ****         sprintf(message, "WHO AM I REG: 0x%02X [Expected: 0x33]\r\n", who_am_i_reg);
-  93              		.loc 1 54 0
+  49:main.c        ****     {
+  50:main.c        ****         sprintf(message, "WHO AM I REG: 0x%02X [Expected: 0x33]\r\n", who_am_i_reg);
+  93              		.loc 1 50 0
   94 0044 9DF80320 		ldrb	r2, [sp, #3]	@ zero_extendqisi2
   95 0048 4E49     		ldr	r1, .L21+4
   96 004a 01A8     		add	r0, sp, #4
   97              	.LVL9:
   98 004c FFF7FEFF 		bl	sprintf
   99              	.LVL10:
-  55:main.c        ****         UART_Debug_PutString(message); 
- 100              		.loc 1 55 0
+  51:main.c        ****         UART_Debug_PutString(message); 
+ 100              		.loc 1 51 0
  101 0050 01A8     		add	r0, sp, #4
  102 0052 FFF7FEFF 		bl	UART_Debug_PutString
  103              	.LVL11:
  104 0056 02E0     		b	.L6
  105              	.LVL12:
  106              	.L5:
-  56:main.c        ****     }
-  57:main.c        ****     else
-  58:main.c        ****     {
-  59:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm\r\n");   
- 107              		.loc 1 59 0
+  52:main.c        ****     }
+  53:main.c        ****     else
+  54:main.c        ****     {
+  55:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm\r\n");   
+ 107              		.loc 1 55 0
  108 0058 4B48     		ldr	r0, .L21+8
  109              	.LVL13:
  110 005a FFF7FEFF 		bl	UART_Debug_PutString
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 4
-
-
  111              	.LVL14:
  112              	.L6:
-  60:main.c        ****     }
+  56:main.c        ****     }
+  57:main.c        ****     
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 4
+
+
+  58:main.c        ****     /******************************************/
+  59:main.c        ****     /*      I2C Reading Status Register       */
+  60:main.c        ****     /******************************************/
   61:main.c        ****     
-  62:main.c        ****     /******************************************/
-  63:main.c        ****     /*      I2C Reading Status Register       */
-  64:main.c        ****     /******************************************/
-  65:main.c        ****     
-  66:main.c        ****     uint8_t status_register; 
-  67:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 113              		.loc 1 67 0
+  62:main.c        ****     uint8_t status_register; 
+  63:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 113              		.loc 1 63 0
  114 005e 0DF10202 		add	r2, sp, #2
  115 0062 2721     		movs	r1, #39
  116 0064 1820     		movs	r0, #24
  117 0066 FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  118              	.LVL15:
-  68:main.c        ****                                         LIS3DH_STATUS_REG,
-  69:main.c        ****                                         &status_register);
-  70:main.c        ****     
-  71:main.c        ****     if (error == NO_ERROR)
- 119              		.loc 1 71 0
+  64:main.c        ****                                         LIS3DH_STATUS_REG,
+  65:main.c        ****                                         &status_register);
+  66:main.c        ****     
+  67:main.c        ****     if (error == NO_ERROR)
+ 119              		.loc 1 67 0
  120 006a 48B9     		cbnz	r0, .L7
-  72:main.c        ****     {
-  73:main.c        ****         sprintf(message, "STATUS REGISTER: 0x%02X\r\n", status_register);
- 121              		.loc 1 73 0
+  68:main.c        ****     {
+  69:main.c        ****         sprintf(message, "STATUS REGISTER: 0x%02X\r\n", status_register);
+ 121              		.loc 1 69 0
  122 006c 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
  123 0070 4649     		ldr	r1, .L21+12
  124 0072 01A8     		add	r0, sp, #4
  125              	.LVL16:
  126 0074 FFF7FEFF 		bl	sprintf
  127              	.LVL17:
-  74:main.c        ****         UART_Debug_PutString(message); 
- 128              		.loc 1 74 0
+  70:main.c        ****         UART_Debug_PutString(message); 
+ 128              		.loc 1 70 0
  129 0078 01A8     		add	r0, sp, #4
  130 007a FFF7FEFF 		bl	UART_Debug_PutString
  131              	.LVL18:
  132 007e 02E0     		b	.L8
  133              	.LVL19:
  134              	.L7:
-  75:main.c        ****     }
-  76:main.c        ****     else
-  77:main.c        ****     {
-  78:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read status register\r\n");   
- 135              		.loc 1 78 0
+  71:main.c        ****     }
+  72:main.c        ****     else
+  73:main.c        ****     {
+  74:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read status register\r\n");   
+ 135              		.loc 1 74 0
  136 0080 4348     		ldr	r0, .L21+16
  137              	.LVL20:
  138 0082 FFF7FEFF 		bl	UART_Debug_PutString
  139              	.LVL21:
  140              	.L8:
-  79:main.c        ****     }
-  80:main.c        ****     
-  81:main.c        ****     /******************************************/
-  82:main.c        ****     /*        Read Control Register 1         */
-  83:main.c        ****     /******************************************/
-  84:main.c        ****     uint8_t ctrl_reg1; 
-  85:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 141              		.loc 1 85 0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 5
-
-
+  75:main.c        ****     }
+  76:main.c        ****     
+  77:main.c        ****     /******************************************/
+  78:main.c        ****     /*        Read Control Register 1         */
+  79:main.c        ****     /******************************************/
+  80:main.c        ****     uint8_t ctrl_reg1; 
+  81:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 141              		.loc 1 81 0
  142 0086 0DF10102 		add	r2, sp, #1
  143 008a 2021     		movs	r1, #32
  144 008c 1820     		movs	r0, #24
  145 008e FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 5
+
+
  146              	.LVL22:
-  86:main.c        ****                                         LIS3DH_CTRL_REG1,
-  87:main.c        ****                                         &ctrl_reg1);
-  88:main.c        ****     
-  89:main.c        ****     if (error == NO_ERROR)
- 147              		.loc 1 89 0
+  82:main.c        ****                                         LIS3DH_CTRL_REG1,
+  83:main.c        ****                                         &ctrl_reg1);
+  84:main.c        ****     
+  85:main.c        ****     if (error == NO_ERROR)
+ 147              		.loc 1 85 0
  148 0092 48B9     		cbnz	r0, .L9
-  90:main.c        ****     {
-  91:main.c        ****         sprintf(message, "CONTROL REGISTER 1: 0x%02X\r\n", ctrl_reg1);
- 149              		.loc 1 91 0
+  86:main.c        ****     {
+  87:main.c        ****         sprintf(message, "CONTROL REGISTER 1: 0x%02X\r\n", ctrl_reg1);
+ 149              		.loc 1 87 0
  150 0094 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
  151 0098 3E49     		ldr	r1, .L21+20
  152 009a 01A8     		add	r0, sp, #4
  153              	.LVL23:
  154 009c FFF7FEFF 		bl	sprintf
  155              	.LVL24:
-  92:main.c        ****         UART_Debug_PutString(message); 
- 156              		.loc 1 92 0
+  88:main.c        ****         UART_Debug_PutString(message); 
+ 156              		.loc 1 88 0
  157 00a0 01A8     		add	r0, sp, #4
  158 00a2 FFF7FEFF 		bl	UART_Debug_PutString
  159              	.LVL25:
  160 00a6 02E0     		b	.L10
  161              	.LVL26:
  162              	.L9:
-  93:main.c        ****     }
-  94:main.c        ****     else
-  95:main.c        ****     {
-  96:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
- 163              		.loc 1 96 0
+  89:main.c        ****     }
+  90:main.c        ****     else
+  91:main.c        ****     {
+  92:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
+ 163              		.loc 1 92 0
  164 00a8 3B48     		ldr	r0, .L21+24
  165              	.LVL27:
  166 00aa FFF7FEFF 		bl	UART_Debug_PutString
  167              	.LVL28:
  168              	.L10:
-  97:main.c        ****     }
+  93:main.c        ****     }
+  94:main.c        ****     
+  95:main.c        ****     /******************************************/
+  96:main.c        ****     /*            I2C Writing                 */
+  97:main.c        ****     /******************************************/
   98:main.c        ****     
-  99:main.c        ****     /******************************************/
- 100:main.c        ****     /*            I2C Writing                 */
- 101:main.c        ****     /******************************************/
- 102:main.c        ****     
- 103:main.c        ****         
- 104:main.c        ****     UART_Debug_PutString("\r\nWriting new values..\r\n");
- 169              		.loc 1 104 0
+  99:main.c        ****         
+ 100:main.c        ****     UART_Debug_PutString("\r\nWriting new values..\r\n");
+ 169              		.loc 1 100 0
  170 00ae 3B48     		ldr	r0, .L21+28
  171 00b0 FFF7FEFF 		bl	UART_Debug_PutString
  172              	.LVL29:
- 105:main.c        ****     
- 106:main.c        ****     if (ctrl_reg1 != LIS3DH_NORMAL_MODE_CTRL_REG1)
- 173              		.loc 1 106 0
+ 101:main.c        ****     
+ 102:main.c        ****     if (ctrl_reg1 != LIS3DH_NORMAL_MODE_CTRL_REG1)
+ 173              		.loc 1 102 0
  174 00b4 9DF80130 		ldrb	r3, [sp, #1]	@ zero_extendqisi2
  175 00b8 572B     		cmp	r3, #87
  176 00ba 14D0     		beq	.L11
- 107:main.c        ****     {
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 6
-
-
- 108:main.c        ****         ctrl_reg1 = LIS3DH_NORMAL_MODE_CTRL_REG1;
- 177              		.loc 1 108 0
+ 103:main.c        ****     {
+ 104:main.c        ****         ctrl_reg1 = LIS3DH_NORMAL_MODE_CTRL_REG1;
+ 177              		.loc 1 104 0
  178 00bc 5722     		movs	r2, #87
  179 00be 8DF80120 		strb	r2, [sp, #1]
- 109:main.c        ****     
- 110:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
- 180              		.loc 1 110 0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 6
+
+
+ 105:main.c        ****     
+ 106:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
+ 180              		.loc 1 106 0
  181 00c2 2021     		movs	r1, #32
  182 00c4 1820     		movs	r0, #24
  183 00c6 FFF7FEFF 		bl	I2C_Peripheral_WriteRegister
  184              	.LVL30:
- 111:main.c        ****                                              LIS3DH_CTRL_REG1,
- 112:main.c        ****                                              ctrl_reg1);
- 113:main.c        ****     
- 114:main.c        ****         if (error == NO_ERROR)
- 185              		.loc 1 114 0
+ 107:main.c        ****                                              LIS3DH_CTRL_REG1,
+ 108:main.c        ****                                              ctrl_reg1);
+ 109:main.c        ****     
+ 110:main.c        ****         if (error == NO_ERROR)
+ 185              		.loc 1 110 0
  186 00ca 48B9     		cbnz	r0, .L12
- 115:main.c        ****         {
- 116:main.c        ****             sprintf(message, "CONTROL REGISTER 1 successfully written as: 0x%02X\r\n", ctrl_reg1);
- 187              		.loc 1 116 0
+ 111:main.c        ****         {
+ 112:main.c        ****             sprintf(message, "CONTROL REGISTER 1 successfully written as: 0x%02X\r\n", ctrl_reg1);
+ 187              		.loc 1 112 0
  188 00cc 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
  189 00d0 3349     		ldr	r1, .L21+32
  190 00d2 01A8     		add	r0, sp, #4
  191              	.LVL31:
  192 00d4 FFF7FEFF 		bl	sprintf
  193              	.LVL32:
- 117:main.c        ****             UART_Debug_PutString(message); 
- 194              		.loc 1 117 0
+ 113:main.c        ****             UART_Debug_PutString(message); 
+ 194              		.loc 1 113 0
  195 00d8 01A8     		add	r0, sp, #4
  196 00da FFF7FEFF 		bl	UART_Debug_PutString
  197              	.LVL33:
  198 00de 02E0     		b	.L11
  199              	.LVL34:
  200              	.L12:
- 118:main.c        ****         }
- 119:main.c        ****         else
- 120:main.c        ****         {
- 121:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 1\r\n");  
- 201              		.loc 1 121 0
+ 114:main.c        ****         }
+ 115:main.c        ****         else
+ 116:main.c        ****         {
+ 117:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 1\r\n");  
+ 201              		.loc 1 117 0
  202 00e0 3048     		ldr	r0, .L21+36
  203              	.LVL35:
  204 00e2 FFF7FEFF 		bl	UART_Debug_PutString
  205              	.LVL36:
  206              	.L11:
- 122:main.c        ****         }
- 123:main.c        ****     }
- 124:main.c        ****     
- 125:main.c        ****     /******************************************/
- 126:main.c        ****     /*     Read Control Register 1 again      */
- 127:main.c        ****     /******************************************/
- 128:main.c        **** 
- 129:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 207              		.loc 1 129 0
+ 118:main.c        ****         }
+ 119:main.c        ****     }
+ 120:main.c        ****     
+ 121:main.c        ****     /******************************************/
+ 122:main.c        ****     /*     Read Control Register 1 again      */
+ 123:main.c        ****     /******************************************/
+ 124:main.c        **** 
+ 125:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 207              		.loc 1 125 0
  208 00e6 0DF10102 		add	r2, sp, #1
  209 00ea 2021     		movs	r1, #32
  210 00ec 1820     		movs	r0, #24
  211 00ee FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 7
-
-
  212              	.LVL37:
- 130:main.c        ****                                         LIS3DH_CTRL_REG1,
- 131:main.c        ****                                         &ctrl_reg1);
- 132:main.c        ****     
- 133:main.c        ****     if (error == NO_ERROR)
- 213              		.loc 1 133 0
+ 126:main.c        ****                                         LIS3DH_CTRL_REG1,
+ 127:main.c        ****                                         &ctrl_reg1);
+ 128:main.c        ****     
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 7
+
+
+ 129:main.c        ****     if (error == NO_ERROR)
+ 213              		.loc 1 129 0
  214 00f2 48B9     		cbnz	r0, .L13
- 134:main.c        ****     {
- 135:main.c        ****         sprintf(message, "CONTROL REGISTER 1 after overwrite operation: 0x%02X\r\n", ctrl_reg1);
- 215              		.loc 1 135 0
+ 130:main.c        ****     {
+ 131:main.c        ****         sprintf(message, "CONTROL REGISTER 1 after overwrite operation: 0x%02X\r\n", ctrl_reg1);
+ 215              		.loc 1 131 0
  216 00f4 9DF80120 		ldrb	r2, [sp, #1]	@ zero_extendqisi2
  217 00f8 2B49     		ldr	r1, .L21+40
  218 00fa 01A8     		add	r0, sp, #4
  219              	.LVL38:
  220 00fc FFF7FEFF 		bl	sprintf
  221              	.LVL39:
- 136:main.c        ****         UART_Debug_PutString(message); 
- 222              		.loc 1 136 0
+ 132:main.c        ****         UART_Debug_PutString(message); 
+ 222              		.loc 1 132 0
  223 0100 01A8     		add	r0, sp, #4
  224 0102 FFF7FEFF 		bl	UART_Debug_PutString
  225              	.LVL40:
  226 0106 02E0     		b	.L14
  227              	.LVL41:
  228              	.L13:
- 137:main.c        ****     }
- 138:main.c        ****     else
- 139:main.c        ****     {
- 140:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
- 229              		.loc 1 140 0
+ 133:main.c        ****     }
+ 134:main.c        ****     else
+ 135:main.c        ****     {
+ 136:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
+ 229              		.loc 1 136 0
  230 0108 2348     		ldr	r0, .L21+24
  231              	.LVL42:
  232 010a FFF7FEFF 		bl	UART_Debug_PutString
  233              	.LVL43:
  234              	.L14:
- 141:main.c        ****     }
+ 137:main.c        ****     }
+ 138:main.c        ****     
+ 139:main.c        ****      /******************************************/
+ 140:main.c        ****      /*    I2C Reading Control Register 4      */
+ 141:main.c        ****      /******************************************/
  142:main.c        ****     
- 143:main.c        ****      /******************************************/
- 144:main.c        ****      /*    I2C Reading Control Register 4      */
- 145:main.c        ****      /******************************************/
- 146:main.c        ****     
- 147:main.c        ****     uint8_t ctrl_reg4;
- 148:main.c        **** 
- 149:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 235              		.loc 1 149 0
+ 143:main.c        ****     uint8_t ctrl_reg4;
+ 144:main.c        **** 
+ 145:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 235              		.loc 1 145 0
  236 010e 6A46     		mov	r2, sp
  237 0110 2321     		movs	r1, #35
  238 0112 1820     		movs	r0, #24
  239 0114 FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  240              	.LVL44:
- 150:main.c        ****                                         LIS3DH_CTRL_REG4,
- 151:main.c        ****                                         &ctrl_reg4);
- 152:main.c        ****     
- 153:main.c        ****     if (error == NO_ERROR)
- 241              		.loc 1 153 0
+ 146:main.c        ****                                         LIS3DH_CTRL_REG4,
+ 147:main.c        ****                                         &ctrl_reg4);
+ 148:main.c        ****     
+ 149:main.c        ****     if (error == NO_ERROR)
+ 241              		.loc 1 149 0
  242 0118 48B9     		cbnz	r0, .L15
- 154:main.c        ****     {
- 155:main.c        ****         sprintf(message, "CONTROL REGISTER 4: 0x%02X\r\n", ctrl_reg4);
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 8
-
-
- 243              		.loc 1 155 0
+ 150:main.c        ****     {
+ 151:main.c        ****         sprintf(message, "CONTROL REGISTER 4: 0x%02X\r\n", ctrl_reg4);
+ 243              		.loc 1 151 0
  244 011a 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
  245 011e 2349     		ldr	r1, .L21+44
  246 0120 01A8     		add	r0, sp, #4
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 8
+
+
  247              	.LVL45:
  248 0122 FFF7FEFF 		bl	sprintf
  249              	.LVL46:
- 156:main.c        ****         UART_Debug_PutString(message); 
- 250              		.loc 1 156 0
+ 152:main.c        ****         UART_Debug_PutString(message); 
+ 250              		.loc 1 152 0
  251 0126 01A8     		add	r0, sp, #4
  252 0128 FFF7FEFF 		bl	UART_Debug_PutString
  253              	.LVL47:
  254 012c 02E0     		b	.L16
  255              	.LVL48:
  256              	.L15:
- 157:main.c        ****     }
- 158:main.c        ****     else
- 159:main.c        ****     {
- 160:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
- 257              		.loc 1 160 0
+ 153:main.c        ****     }
+ 154:main.c        ****     else
+ 155:main.c        ****     {
+ 156:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
+ 257              		.loc 1 156 0
  258 012e 2048     		ldr	r0, .L21+48
  259              	.LVL49:
  260 0130 FFF7FEFF 		bl	UART_Debug_PutString
  261              	.LVL50:
  262              	.L16:
- 161:main.c        ****     }
- 162:main.c        ****     
- 163:main.c        ****     
- 164:main.c        ****     ctrl_reg4 = LIS3DH_CTRL_REG4_BDU_ACTIVE;
- 263              		.loc 1 164 0
+ 157:main.c        ****     }
+ 158:main.c        ****     
+ 159:main.c        ****     
+ 160:main.c        ****     ctrl_reg4 = LIS3DH_CTRL_REG4_BDU_ACTIVE;
+ 263              		.loc 1 160 0
  264 0134 8022     		movs	r2, #128
  265 0136 0EAC     		add	r4, sp, #56
  266              	.LVL51:
  267 0138 04F8382D 		strb	r2, [r4, #-56]!
- 165:main.c        ****     
- 166:main.c        ****     error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
- 268              		.loc 1 166 0
+ 161:main.c        ****     
+ 162:main.c        ****     error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
+ 268              		.loc 1 162 0
  269 013c 2321     		movs	r1, #35
  270 013e 1820     		movs	r0, #24
  271 0140 FFF7FEFF 		bl	I2C_Peripheral_WriteRegister
  272              	.LVL52:
- 167:main.c        ****                                          LIS3DH_CTRL_REG4,
- 168:main.c        ****                                          ctrl_reg4);
- 169:main.c        ****     
- 170:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 273              		.loc 1 170 0
+ 163:main.c        ****                                          LIS3DH_CTRL_REG4,
+ 164:main.c        ****                                          ctrl_reg4);
+ 165:main.c        ****     
+ 166:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 273              		.loc 1 166 0
  274 0144 2246     		mov	r2, r4
  275 0146 2321     		movs	r1, #35
  276 0148 1820     		movs	r0, #24
  277 014a FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  278              	.LVL53:
- 171:main.c        ****                                         LIS3DH_CTRL_REG4,
- 172:main.c        ****                                         &ctrl_reg4);
- 173:main.c        ****     
- 174:main.c        ****     
- 175:main.c        ****     if (error == NO_ERROR)
- 279              		.loc 1 175 0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 9
-
-
+ 167:main.c        ****                                         LIS3DH_CTRL_REG4,
+ 168:main.c        ****                                         &ctrl_reg4);
+ 169:main.c        ****     
+ 170:main.c        ****     
+ 171:main.c        ****     if (error == NO_ERROR)
+ 279              		.loc 1 171 0
  280 014e 48B9     		cbnz	r0, .L17
- 176:main.c        ****     {
- 177:main.c        ****         sprintf(message, "CONTROL REGISTER 4 after being updated: 0x%02X\r\n", ctrl_reg4);
- 281              		.loc 1 177 0
+ 172:main.c        ****     {
+ 173:main.c        ****         sprintf(message, "CONTROL REGISTER 4 after being updated: 0x%02X\r\n", ctrl_reg4);
+ 281              		.loc 1 173 0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 9
+
+
  282 0150 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
  283 0154 1749     		ldr	r1, .L21+52
  284 0156 01A8     		add	r0, sp, #4
  285              	.LVL54:
  286 0158 FFF7FEFF 		bl	sprintf
  287              	.LVL55:
- 178:main.c        ****         UART_Debug_PutString(message); 
- 288              		.loc 1 178 0
+ 174:main.c        ****         UART_Debug_PutString(message); 
+ 288              		.loc 1 174 0
  289 015c 01A8     		add	r0, sp, #4
  290 015e FFF7FEFF 		bl	UART_Debug_PutString
  291              	.LVL56:
  292 0162 02E0     		b	.L18
  293              	.LVL57:
  294              	.L17:
- 179:main.c        ****     }
- 180:main.c        ****     else
- 181:main.c        ****     {
- 182:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
- 295              		.loc 1 182 0
+ 175:main.c        ****     }
+ 176:main.c        ****     else
+ 177:main.c        ****     {
+ 178:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
+ 295              		.loc 1 178 0
  296 0164 1248     		ldr	r0, .L21+48
  297              	.LVL58:
  298 0166 FFF7FEFF 		bl	UART_Debug_PutString
  299              	.LVL59:
  300              	.L18:
- 183:main.c        ****     }
- 184:main.c        ****     
- 185:main.c        ****     
- 186:main.c        ****     //Start timer and custom ISR in order to start reading from the IMU
- 187:main.c        ****     //after the initialization of the registers
- 188:main.c        ****     Timer_ISR_Start();
- 301              		.loc 1 188 0
+ 179:main.c        ****     }
+ 180:main.c        ****     
+ 181:main.c        ****     
+ 182:main.c        ****     // Start timer and custom ISR in order to start reading from the IMU after the initialization o
+ 183:main.c        ****     Timer_ISR_Start();
+ 301              		.loc 1 183 0
  302 016a FFF7FEFF 		bl	Timer_ISR_Start
  303              	.LVL60:
- 189:main.c        ****     ISR_IMU_StartEx(Custom_ISR_IMU);
- 304              		.loc 1 189 0
+ 184:main.c        ****     ISR_IMU_StartEx(Custom_ISR_IMU);
+ 304              		.loc 1 184 0
  305 016e 1248     		ldr	r0, .L21+56
  306 0170 FFF7FEFF 		bl	ISR_IMU_StartEx
  307              	.LVL61:
- 190:main.c        ****    
- 191:main.c        ****     
- 192:main.c        ****     dataBuffer[0] = HEADER;
- 308              		.loc 1 192 0
+ 185:main.c        ****    
+ 186:main.c        ****     // Initialize the header and tail only once in the data buffer to be sent over UART
+ 187:main.c        ****     dataBuffer[0] = HEADER;
+ 308              		.loc 1 187 0
  309 0174 114B     		ldr	r3, .L21+60
  310 0176 A022     		movs	r2, #160
  311 0178 1A70     		strb	r2, [r3]
- 193:main.c        ****     dataBuffer[TRANSMIT_BUFFER_SIZE -1] = TAIL;
- 312              		.loc 1 193 0
- 313 017a E022     		movs	r2, #224
+ 188:main.c        ****     dataBuffer[TRANSMIT_BUFFER_SIZE -1] = TAIL;
+ 312              		.loc 1 188 0
+ 313 017a C022     		movs	r2, #192
  314 017c DA71     		strb	r2, [r3, #7]
  315              	.L19:
  316 017e FEE7     		b	.L19
  317              	.L22:
  318              		.align	2
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 10
-
-
  319              	.L21:
  320 0180 00000000 		.word	.LC0
  321 0184 20000000 		.word	.LC1
  322 0188 48000000 		.word	.LC2
  323 018c 6C000000 		.word	.LC3
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 10
+
+
  324 0190 88000000 		.word	.LC4
  325 0194 C4000000 		.word	.LC5
  326 0198 E4000000 		.word	.LC6
@@ -598,14 +593,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  354      65642064 
  354      7572696E 
  355 00bb 7465720D 		.ascii	"ter\015\012\000"
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 11
-
-
  355      0A00
  356 00c1 000000   		.space	3
  357              	.LC5:
  358 00c4 434F4E54 		.ascii	"CONTROL REGISTER 1: 0x%02X\015\012\000"
  358      524F4C20 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 11
+
+
  358      52454749 
  358      53544552 
  358      20313A20 
@@ -658,14 +653,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  379      53544552 
  379      20343A20 
  380 0205 000000   		.space	3
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 12
-
-
  381              	.LC12:
  382 0208 4572726F 		.ascii	"Error occurred during I2C comm to read control regi"
  382      72206F63 
  382      63757272 
  382      65642064 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 12
+
+
  382      7572696E 
  383 023b 73746572 		.ascii	"ster4\015\012\000"
  383      340D0A00 
@@ -718,14 +713,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  426 0039 08       		.byte	0x8
  427 003a B8000000 		.4byte	.LASF1
  428 003e 02       		.uleb128 0x2
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 13
-
-
  429 003f 02       		.byte	0x2
  430 0040 05       		.byte	0x5
  431 0041 7D020000 		.4byte	.LASF2
  432 0045 02       		.uleb128 0x2
  433 0046 02       		.byte	0x2
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 13
+
+
  434 0047 07       		.byte	0x7
  435 0048 66010000 		.4byte	.LASF3
  436 004c 03       		.uleb128 0x3
@@ -778,14 +773,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  483 00a5 02       		.uleb128 0x2
  484 00a6 01       		.byte	0x1
  485 00a7 08       		.byte	0x8
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 14
-
-
  486 00a8 5C020000 		.4byte	.LASF15
  487 00ac 05       		.uleb128 0x5
  488 00ad 01       		.byte	0x1
  489 00ae 37000000 		.4byte	0x37
  490 00b2 04       		.byte	0x4
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 14
+
+
  491 00b3 15       		.byte	0x15
  492 00b4 C5000000 		.4byte	0xc5
  493 00b8 06       		.uleb128 0x6
@@ -811,7 +806,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  513 00de 07       		.uleb128 0x7
  514 00df CA010000 		.4byte	.LASF42
  515 00e3 01       		.byte	0x1
- 516 00e4 11       		.byte	0x11
+ 516 00e4 0E       		.byte	0xe
  517 00e5 73000000 		.4byte	0x73
  518 00e9 00000000 		.4byte	.LFB64
  519 00ed C0010000 		.4byte	.LFE64-.LFB64
@@ -821,7 +816,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  523 00f7 08       		.uleb128 0x8
  524 00f8 00000000 		.4byte	.LASF21
  525 00fc 01       		.byte	0x1
- 526 00fd 1D       		.byte	0x1d
+ 526 00fd 19       		.byte	0x19
  527 00fe EC040000 		.4byte	0x4ec
  528 0102 02       		.uleb128 0x2
  529 0103 91       		.byte	0x91
@@ -829,7 +824,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  531 0105 08       		.uleb128 0x8
  532 0106 AE020000 		.4byte	.LASF22
  533 010a 01       		.byte	0x1
- 534 010b 30       		.byte	0x30
+ 534 010b 2C       		.byte	0x2c
  535 010c 81000000 		.4byte	0x81
  536 0110 02       		.uleb128 0x2
  537 0111 91       		.byte	0x91
@@ -837,16 +832,16 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  539 0113 09       		.uleb128 0x9
  540 0114 30020000 		.4byte	.LASF23
  541 0118 01       		.byte	0x1
- 542 0119 31       		.byte	0x31
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 15
-
-
+ 542 0119 2D       		.byte	0x2d
  543 011a C5000000 		.4byte	0xc5
  544 011e 00000000 		.4byte	.LLST0
  545 0122 08       		.uleb128 0x8
  546 0123 0F020000 		.4byte	.LASF24
  547 0127 01       		.byte	0x1
- 548 0128 42       		.byte	0x42
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 15
+
+
+ 548 0128 3E       		.byte	0x3e
  549 0129 81000000 		.4byte	0x81
  550 012d 02       		.uleb128 0x2
  551 012e 91       		.byte	0x91
@@ -854,7 +849,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  553 0130 08       		.uleb128 0x8
  554 0131 CF010000 		.4byte	.LASF25
  555 0135 01       		.byte	0x1
- 556 0136 54       		.byte	0x54
+ 556 0136 50       		.byte	0x50
  557 0137 81000000 		.4byte	0x81
  558 013b 02       		.uleb128 0x2
  559 013c 91       		.byte	0x91
@@ -862,7 +857,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  561 013e 08       		.uleb128 0x8
  562 013f D9010000 		.4byte	.LASF26
  563 0143 01       		.byte	0x1
- 564 0144 93       		.byte	0x93
+ 564 0144 8F       		.byte	0x8f
  565 0145 81000000 		.4byte	0x81
  566 0149 02       		.uleb128 0x2
  567 014a 91       		.byte	0x91
@@ -874,7 +869,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  573 0159 0B       		.uleb128 0xb
  574 015a 6900     		.ascii	"i\000"
  575 015c 01       		.byte	0x1
- 576 015d 20       		.byte	0x20
+ 576 015d 1C       		.byte	0x1c
  577 015e 73000000 		.4byte	0x73
  578 0162 A2000000 		.4byte	.LLST1
  579 0166 0C       		.uleb128 0xc
@@ -898,14 +893,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  597 018a 02       		.uleb128 0x2
  598 018b 91       		.byte	0x91
  599 018c 44       		.sleb128 -60
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 16
-
-
  600 018d 0D       		.uleb128 0xd
  601 018e 01       		.uleb128 0x1
  602 018f 51       		.byte	0x51
  603 0190 05       		.uleb128 0x5
  604 0191 03       		.byte	0x3
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 16
+
+
  605 0192 00000000 		.4byte	.LC0
  606 0196 0D       		.uleb128 0xd
  607 0197 01       		.uleb128 0x1
@@ -958,14 +953,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  654 01ea 0D       		.uleb128 0xd
  655 01eb 01       		.uleb128 0x1
  656 01ec 52       		.byte	0x52
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 17
-
-
  657 01ed 02       		.uleb128 0x2
  658 01ee 91       		.byte	0x91
  659 01ef 43       		.sleb128 -61
  660 01f0 00       		.byte	0
  661 01f1 0C       		.uleb128 0xc
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 17
+
+
  662 01f2 50000000 		.4byte	.LVL10
  663 01f6 39050000 		.4byte	0x539
  664 01fa 0E020000 		.4byte	0x20e
@@ -1018,14 +1013,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  711 024d 51       		.byte	0x51
  712 024e 02       		.uleb128 0x2
  713 024f 08       		.byte	0x8
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 18
-
-
  714 0250 27       		.byte	0x27
  715 0251 0D       		.uleb128 0xd
  716 0252 01       		.uleb128 0x1
  717 0253 52       		.byte	0x52
  718 0254 02       		.uleb128 0x2
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 18
+
+
  719 0255 91       		.byte	0x91
  720 0256 42       		.sleb128 -62
  721 0257 00       		.byte	0
@@ -1078,14 +1073,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  768 02b0 01       		.uleb128 0x1
  769 02b1 48       		.byte	0x48
  770 02b2 0D       		.uleb128 0xd
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 19
-
-
  771 02b3 01       		.uleb128 0x1
  772 02b4 51       		.byte	0x51
  773 02b5 02       		.uleb128 0x2
  774 02b6 08       		.byte	0x8
  775 02b7 20       		.byte	0x20
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 19
+
+
  776 02b8 0D       		.uleb128 0xd
  777 02b9 01       		.uleb128 0x1
  778 02ba 52       		.byte	0x52
@@ -1138,14 +1133,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  825 0310 1E030000 		.4byte	0x31e
  826 0314 0D       		.uleb128 0xd
  827 0315 01       		.uleb128 0x1
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 20
-
-
  828 0316 50       		.byte	0x50
  829 0317 05       		.uleb128 0x5
  830 0318 03       		.byte	0x3
  831 0319 20010000 		.4byte	.LC7
  832 031d 00       		.byte	0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 20
+
+
  833 031e 0C       		.uleb128 0xc
  834 031f CA000000 		.4byte	.LVL30
  835 0323 7B050000 		.4byte	0x57b
@@ -1198,14 +1193,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  882 036d 00       		.byte	0
  883 036e 0C       		.uleb128 0xc
  884 036f E6000000 		.4byte	.LVL36
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 21
-
-
  885 0373 44050000 		.4byte	0x544
  886 0377 85030000 		.4byte	0x385
  887 037b 0D       		.uleb128 0xd
  888 037c 01       		.uleb128 0x1
  889 037d 50       		.byte	0x50
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 21
+
+
  890 037e 05       		.uleb128 0x5
  891 037f 03       		.byte	0x3
  892 0380 74010000 		.4byte	.LC9
@@ -1258,14 +1253,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  939 03d0 50       		.byte	0x50
  940 03d1 02       		.uleb128 0x2
  941 03d2 91       		.byte	0x91
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 22
-
-
  942 03d3 44       		.sleb128 -60
  943 03d4 00       		.byte	0
  944 03d5 0C       		.uleb128 0xc
  945 03d6 0E010000 		.4byte	.LVL43
  946 03da 44050000 		.4byte	0x544
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 22
+
+
  947 03de EC030000 		.4byte	0x3ec
  948 03e2 0D       		.uleb128 0xd
  949 03e3 01       		.uleb128 0x1
@@ -1318,14 +1313,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  996 042d 44050000 		.4byte	0x544
  997 0431 3C040000 		.4byte	0x43c
  998 0435 0D       		.uleb128 0xd
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 23
-
-
  999 0436 01       		.uleb128 0x1
  1000 0437 50       		.byte	0x50
  1001 0438 02       		.uleb128 0x2
  1002 0439 91       		.byte	0x91
  1003 043a 44       		.sleb128 -60
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 23
+
+
  1004 043b 00       		.byte	0
  1005 043c 0C       		.uleb128 0xc
  1006 043d 34010000 		.4byte	.LVL50
@@ -1378,14 +1373,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1053 048a 0D       		.uleb128 0xd
  1054 048b 01       		.uleb128 0x1
  1055 048c 52       		.byte	0x52
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 24
-
-
  1056 048d 02       		.uleb128 0x2
  1057 048e 74       		.byte	0x74
  1058 048f 00       		.sleb128 0
  1059 0490 00       		.byte	0
  1060 0491 0C       		.uleb128 0xc
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 24
+
+
  1061 0492 5C010000 		.4byte	.LVL55
  1062 0496 39050000 		.4byte	0x539
  1063 049a AE040000 		.4byte	0x4ae
@@ -1438,14 +1433,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1110 04f6 D7000000 		.4byte	0xd7
  1111 04fa 31       		.byte	0x31
  1112 04fb 00       		.byte	0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 25
-
-
  1113 04fc 12       		.uleb128 0x12
  1114 04fd 96010000 		.4byte	.LASF27
  1115 0501 05       		.byte	0x5
  1116 0502 1207     		.2byte	0x712
  1117 0504 08050000 		.4byte	0x508
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 25
+
+
  1118 0508 13       		.uleb128 0x13
  1119 0509 8C000000 		.4byte	0x8c
  1120 050d 10       		.uleb128 0x10
@@ -1458,7 +1453,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1127 051d 14       		.uleb128 0x14
  1128 051e BF010000 		.4byte	.LASF28
  1129 0522 06       		.byte	0x6
- 1130 0523 19       		.byte	0x19
+ 1130 0523 15       		.byte	0x15
  1131 0524 0D050000 		.4byte	0x50d
  1132 0528 05       		.uleb128 0x5
  1133 0529 03       		.byte	0x3
@@ -1467,7 +1462,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1136 052f 22000000 		.4byte	.LASF29
  1137 0533 22000000 		.4byte	.LASF29
  1138 0537 07       		.byte	0x7
- 1139 0538 9B       		.byte	0x9b
+ 1139 0538 8D       		.byte	0x8d
  1140 0539 15       		.uleb128 0x15
  1141 053a BB020000 		.4byte	.LASF30
  1142 053e BB020000 		.4byte	.LASF30
@@ -1482,7 +1477,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1151 0550 CB020000 		.4byte	.LASF32
  1152 0554 CB020000 		.4byte	.LASF32
  1153 0558 07       		.byte	0x7
- 1154 0559 55       		.byte	0x55
+ 1154 0559 47       		.byte	0x47
  1155 055a 15       		.uleb128 0x15
  1156 055b 44020000 		.4byte	.LASF33
  1157 055f 44020000 		.4byte	.LASF33
@@ -1497,15 +1492,15 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1166 0571 61020000 		.4byte	.LASF35
  1167 0575 61020000 		.4byte	.LASF35
  1168 0579 07       		.byte	0x7
- 1169 057a 66       		.byte	0x66
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 26
-
-
+ 1169 057a 58       		.byte	0x58
  1170 057b 15       		.uleb128 0x15
  1171 057c 79010000 		.4byte	.LASF36
  1172 0580 79010000 		.4byte	.LASF36
  1173 0584 07       		.byte	0x7
- 1174 0585 81       		.byte	0x81
+ 1174 0585 73       		.byte	0x73
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 26
+
+
  1175 0586 15       		.uleb128 0x15
  1176 0587 08000000 		.4byte	.LASF37
  1177 058b 08000000 		.4byte	.LASF37
@@ -1558,14 +1553,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1224 0024 0B       		.uleb128 0xb
  1225 0025 3B       		.uleb128 0x3b
  1226 0026 0B       		.uleb128 0xb
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 27
-
-
  1227 0027 49       		.uleb128 0x49
  1228 0028 13       		.uleb128 0x13
  1229 0029 00       		.byte	0
  1230 002a 00       		.byte	0
  1231 002b 04       		.uleb128 0x4
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 27
+
+
  1232 002c 24       		.uleb128 0x24
  1233 002d 00       		.byte	0
  1234 002e 0B       		.uleb128 0xb
@@ -1618,14 +1613,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1281 005d 8701     		.uleb128 0x87
  1282 005f 19       		.uleb128 0x19
  1283 0060 11       		.uleb128 0x11
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 28
-
-
  1284 0061 01       		.uleb128 0x1
  1285 0062 12       		.uleb128 0x12
  1286 0063 06       		.uleb128 0x6
  1287 0064 40       		.uleb128 0x40
  1288 0065 18       		.uleb128 0x18
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 28
+
+
  1289 0066 9742     		.uleb128 0x2117
  1290 0068 19       		.uleb128 0x19
  1291 0069 01       		.uleb128 0x1
@@ -1678,14 +1673,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1338 0098 00       		.byte	0
  1339 0099 03       		.uleb128 0x3
  1340 009a 08       		.uleb128 0x8
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 29
-
-
  1341 009b 3A       		.uleb128 0x3a
  1342 009c 0B       		.uleb128 0xb
  1343 009d 3B       		.uleb128 0x3b
  1344 009e 0B       		.uleb128 0xb
  1345 009f 49       		.uleb128 0x49
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 29
+
+
  1346 00a0 13       		.uleb128 0x13
  1347 00a1 02       		.uleb128 0x2
  1348 00a2 17       		.uleb128 0x17
@@ -1738,14 +1733,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1395 00da 13       		.uleb128 0x13
  1396 00db 00       		.byte	0
  1397 00dc 00       		.byte	0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 30
-
-
  1398 00dd 11       		.uleb128 0x11
  1399 00de 21       		.uleb128 0x21
  1400 00df 00       		.byte	0
  1401 00e0 49       		.uleb128 0x49
  1402 00e1 13       		.uleb128 0x13
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 30
+
+
  1403 00e2 2F       		.uleb128 0x2f
  1404 00e3 0B       		.uleb128 0xb
  1405 00e4 00       		.byte	0
@@ -1798,14 +1793,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1452 0113 19       		.uleb128 0x19
  1453 0114 3C       		.uleb128 0x3c
  1454 0115 19       		.uleb128 0x19
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 31
-
-
  1455 0116 6E       		.uleb128 0x6e
  1456 0117 0E       		.uleb128 0xe
  1457 0118 03       		.uleb128 0x3
  1458 0119 0E       		.uleb128 0xe
  1459 011a 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 31
+
+
  1460 011b 0B       		.uleb128 0xb
  1461 011c 3B       		.uleb128 0x3b
  1462 011d 0B       		.uleb128 0xb
@@ -1858,14 +1853,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1509 006e 18010000 		.4byte	.LVL44
  1510 0072 22010000 		.4byte	.LVL45
  1511 0076 0100     		.2byte	0x1
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 32
-
-
  1512 0078 50       		.byte	0x50
  1513 0079 2E010000 		.4byte	.LVL48
  1514 007d 30010000 		.4byte	.LVL49
  1515 0081 0100     		.2byte	0x1
  1516 0083 50       		.byte	0x50
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 32
+
+
  1517 0084 4E010000 		.4byte	.LVL53
  1518 0088 58010000 		.4byte	.LVL54
  1519 008c 0100     		.2byte	0x1
@@ -1918,14 +1913,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1561      61676500 
  1562              	.LASF37:
  1563 0008 54696D65 		.ascii	"Timer_ISR_Start\000"
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 33
-
-
  1563      725F4953 
  1563      525F5374 
  1563      61727400 
  1564              	.LASF4:
  1565 0018 5F5F7569 		.ascii	"__uint8_t\000"
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 33
+
+
  1565      6E74385F 
  1565      7400
  1566              	.LASF29:
@@ -1978,14 +1973,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1584      31363036 
  1585 00f9 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
  1585      20726576 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 34
-
-
  1585      6973696F 
  1585      6E203233 
  1585      37373135 
  1586 012c 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
  1586      66756E63 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 34
+
+
  1586      74696F6E 
  1586      2D736563 
  1586      74696F6E 
@@ -2038,14 +2033,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1606      3400
  1607              	.LASF10:
  1608 01e3 756E7369 		.ascii	"unsigned int\000"
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 35
-
-
  1608      676E6564 
  1608      20696E74 
  1608      00
  1609              	.LASF9:
  1610 01f0 6C6F6E67 		.ascii	"long long unsigned int\000"
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 35
+
+
  1610      206C6F6E 
  1610      6720756E 
  1610      7369676E 
@@ -2098,14 +2093,14 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 1
  1633              	.LASF16:
  1634 0287 4E4F5F45 		.ascii	"NO_ERROR\000"
  1634      52524F52 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccLv8Vaz.s 			page 36
-
-
  1634      00
  1635              	.LASF17:
  1636 0290 4552524F 		.ascii	"ERROR\000"
  1636      5200
  1637              	.LASF19:
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccvVHHua.s 			page 36
+
+
  1638 0296 6C6F6E67 		.ascii	"long double\000"
  1638      20646F75 
  1638      626C6500 

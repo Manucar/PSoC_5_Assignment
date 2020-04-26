@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 1
 
 
    1              		.syntax unified
@@ -28,39 +28,49 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
   25              	RightAdjust:
   26              	.LFB63:
   27              		.file 1 "DataConversion.c"
-   1:DataConversion.c **** /* ========================================
-   2:DataConversion.c ****  *
-   3:DataConversion.c ****  * Copyright YOUR COMPANY, THE YEAR
-   4:DataConversion.c ****  * All Rights Reserved
-   5:DataConversion.c ****  * UNPUBLISHED, LICENSED SOFTWARE.
-   6:DataConversion.c ****  *
-   7:DataConversion.c ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
-   8:DataConversion.c ****  * WHICH IS THE PROPERTY OF your company.
-   9:DataConversion.c ****  *
-  10:DataConversion.c ****  * ========================================
-  11:DataConversion.c **** */
-  12:DataConversion.c **** #include "DataConversion.h"
-  13:DataConversion.c **** 
-  14:DataConversion.c **** int16_t RightAdjust(uint8_t *arrayToAdjust)
-  15:DataConversion.c **** {
-  28              		.loc 1 15 0
+   1:DataConversion.c **** /* =========================================================
+   2:DataConversion.c ****  * 
+   3:DataConversion.c ****  * The following functions are used for the data conversion
+   4:DataConversion.c ****  *
+   5:DataConversion.c ****  * =========================================================
+   6:DataConversion.c **** */
+   7:DataConversion.c **** #include "DataConversion.h"
+   8:DataConversion.c **** 
+   9:DataConversion.c **** 
+  10:DataConversion.c **** /*  Right justify in a 16 bit integer:
+  11:DataConversion.c ****     
+  12:DataConversion.c ****     from:
+  13:DataConversion.c ****     ╔═════════╦═══════════╦════════�
+  14:DataConversion.c ****     ║         ║  OUT_X_H  ║  OUT_X_L  ║
+  15:DataConversion.c ****     ╠═════════╬═══════════╬════════�
+  16:DataConversion.c ****     ║ Content ║ xxxx xxxx ║ xx00 0000 ║
+  17:DataConversion.c ****     ╚═════════╩═══════════╩════════�
+  18:DataConversion.c ****     
+  19:DataConversion.c ****     to:
+  20:DataConversion.c ****     ╔═════════╦════════════════════�
+  21:DataConversion.c ****     ║ 16int_t ║ 0000 00xx xxxx xxxx ║
+  22:DataConversion.c ****     ╚═════════╩════════════════════�
+  23:DataConversion.c **** */
+  24:DataConversion.c **** int16_t RightAdjust(uint8_t *arrayToAdjust)
+  25:DataConversion.c **** {
+  28              		.loc 1 25 0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
   32              		@ link register save eliminated.
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 2
+
+
   33              	.LVL0:
-  16:DataConversion.c ****     return (int16_t)((arrayToAdjust[0] | arrayToAdjust[1]<<REGISTER_SIZE))>>SHIFT_SIZE;
-  34              		.loc 1 16 0
+  26:DataConversion.c ****     return (int16_t)((arrayToAdjust[0] | arrayToAdjust[1]<<REGISTER_SIZE))>>SHIFT_SIZE;
+  34              		.loc 1 26 0
   35 0000 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
   36 0002 4078     		ldrb	r0, [r0, #1]	@ zero_extendqisi2
   37              	.LVL1:
   38 0004 43EA0020 		orr	r0, r3, r0, lsl #8
-  17:DataConversion.c **** }
-  39              		.loc 1 17 0
+  27:DataConversion.c **** }
+  39              		.loc 1 27 0
   40 0008 40F38910 		sbfx	r0, r0, #6, #10
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 2
-
-
   41 000c 7047     		bx	lr
   42              		.cfi_endproc
   43              	.LFE63:
@@ -78,10 +88,20 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
   55              		.type	MinMaxScaler, %function
   56              	MinMaxScaler:
   57              	.LFB64:
-  18:DataConversion.c **** 
-  19:DataConversion.c **** int16_t MinMaxScaler(float min, float max, float a, float b, float x)
-  20:DataConversion.c **** {   
-  58              		.loc 1 20 0
+  28:DataConversion.c **** 
+  29:DataConversion.c **** 
+  30:DataConversion.c **** /*  Scale the old range in the new range of 'mg' through a MinMaxScaler
+  31:DataConversion.c **** 
+  32:DataConversion.c ****     Actually the old range is from -512 to 511 [is a 10bit integet, and the '0' is considered in th
+  33:DataConversion.c ****     to keep the '0' from the old scale in '0' to the new scale, -512 to 512 scale range was adopted
+  34:DataConversion.c ****     accepting the fact of losing some values in the positive new range (1996 instead of 2000) but t
+  35:DataConversion.c ****     doesn't affect the measurement.
+  36:DataConversion.c **** 
+  37:DataConversion.c ****     All variables are taken as float for doing the correct operations and then casted to int6_t for
+  38:DataConversion.c **** */
+  39:DataConversion.c **** int16_t MinMaxScaler(float min, float max, float a, float b, float x)
+  40:DataConversion.c **** {   
+  58              		.loc 1 40 0
   59              		.cfi_startproc
   60              		@ args = 4, pretend = 0, frame = 0
   61              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -98,8 +118,11 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
   72 0006 0F46     		mov	r7, r1
   73 0008 1446     		mov	r4, r2
   74 000a 9846     		mov	r8, r3
-  21:DataConversion.c ****     return (int16_t)((((x - min) * (b - a))/(max - min)) + a);
-  75              		.loc 1 21 0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 3
+
+
+  41:DataConversion.c ****     return (int16_t)((((x - min) * (b - a))/(max - min)) + a);
+  75              		.loc 1 41 0
   76 000c 0146     		mov	r1, r0
   77              	.LVL3:
   78 000e 0698     		ldr	r0, [sp, #24]	@ float
@@ -118,9 +141,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
   91 0026 0646     		mov	r6, r0
   92 0028 2946     		mov	r1, r5
   93 002a 3846     		mov	r0, r7
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 3
-
-
   94 002c FFF7FEFF 		bl	__aeabi_fsub
   95              	.LVL8:
   96 0030 0146     		mov	r1, r0
@@ -133,8 +153,8 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  103              	.LVL10:
  104 0040 FFF7FEFF 		bl	__aeabi_f2iz
  105              	.LVL11:
-  22:DataConversion.c **** }
- 106              		.loc 1 22 0
+  42:DataConversion.c **** }
+ 106              		.loc 1 42 0
  107 0044 00B2     		sxth	r0, r0
  108 0046 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
  109              		.cfi_endproc
@@ -158,6 +178,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  127 0015 25000000 		.4byte	.LASF25
  128 0019 00000000 		.4byte	.Ldebug_ranges0+0
  129 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 4
+
+
  130 0021 00000000 		.4byte	.Ldebug_line0
  131 0025 02       		.uleb128 0x2
  132 0026 01       		.byte	0x1
@@ -178,9 +201,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  147 0044 29       		.byte	0x29
  148 0045 49000000 		.4byte	0x49
  149 0049 02       		.uleb128 0x2
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 4
-
-
  150 004a 02       		.byte	0x2
  151 004b 05       		.byte	0x5
  152 004c BA010000 		.4byte	.LASF4
@@ -218,6 +238,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  184 0087 07       		.byte	0x7
  185 0088 62010000 		.4byte	.LASF11
  186 008c 03       		.uleb128 0x3
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 5
+
+
  187 008d 86010000 		.4byte	.LASF12
  188 0091 03       		.byte	0x3
  189 0092 18       		.byte	0x18
@@ -238,9 +261,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  204 00b0 67000000 		.4byte	.LASF15
  205 00b4 02       		.uleb128 0x2
  206 00b5 08       		.byte	0x8
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 5
-
-
  207 00b6 04       		.byte	0x4
  208 00b7 1E000000 		.4byte	.LASF16
  209 00bb 02       		.uleb128 0x2
@@ -258,7 +278,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  221 00d0 05       		.uleb128 0x5
  222 00d1 36010000 		.4byte	.LASF20
  223 00d5 01       		.byte	0x1
- 224 00d6 0E       		.byte	0xe
+ 224 00d6 18       		.byte	0x18
  225 00d7 97000000 		.4byte	0x97
  226 00db 00000000 		.4byte	.LFB63
  227 00df 0E000000 		.4byte	.LFE63-.LFB63
@@ -268,7 +288,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  231 00e9 06       		.uleb128 0x6
  232 00ea 54010000 		.4byte	.LASF22
  233 00ee 01       		.byte	0x1
- 234 00ef 0E       		.byte	0xe
+ 234 00ef 18       		.byte	0x18
  235 00f0 F9000000 		.4byte	0xf9
  236 00f4 00000000 		.4byte	.LLST0
  237 00f8 00       		.byte	0
@@ -278,7 +298,10 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  241 00ff 08       		.uleb128 0x8
  242 0100 09010000 		.4byte	.LASF21
  243 0104 01       		.byte	0x1
- 244 0105 13       		.byte	0x13
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 6
+
+
+ 244 0105 27       		.byte	0x27
  245 0106 97000000 		.4byte	0x97
  246 010a 00000000 		.4byte	.LFB64
  247 010e 4A000000 		.4byte	.LFE64-.LFB64
@@ -288,34 +311,31 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  251 0118 09       		.uleb128 0x9
  252 0119 6D696E00 		.ascii	"min\000"
  253 011d 01       		.byte	0x1
- 254 011e 13       		.byte	0x13
+ 254 011e 27       		.byte	0x27
  255 011f AD000000 		.4byte	0xad
  256 0123 21000000 		.4byte	.LLST1
  257 0127 09       		.uleb128 0x9
  258 0128 6D617800 		.ascii	"max\000"
  259 012c 01       		.byte	0x1
- 260 012d 13       		.byte	0x13
+ 260 012d 27       		.byte	0x27
  261 012e AD000000 		.4byte	0xad
  262 0132 4A000000 		.4byte	.LLST2
  263 0136 09       		.uleb128 0x9
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 6
-
-
  264 0137 6100     		.ascii	"a\000"
  265 0139 01       		.byte	0x1
- 266 013a 13       		.byte	0x13
+ 266 013a 27       		.byte	0x27
  267 013b AD000000 		.4byte	0xad
  268 013f 68000000 		.4byte	.LLST3
  269 0143 09       		.uleb128 0x9
  270 0144 6200     		.ascii	"b\000"
  271 0146 01       		.byte	0x1
- 272 0147 13       		.byte	0x13
+ 272 0147 27       		.byte	0x27
  273 0148 AD000000 		.4byte	0xad
  274 014c 86000000 		.4byte	.LLST4
  275 0150 0A       		.uleb128 0xa
  276 0151 7800     		.ascii	"x\000"
  277 0153 01       		.byte	0x1
- 278 0154 13       		.byte	0x13
+ 278 0154 27       		.byte	0x27
  279 0155 AD000000 		.4byte	0xad
  280 0159 02       		.uleb128 0x2
  281 015a 91       		.byte	0x91
@@ -338,6 +358,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  298 0004 0E       		.uleb128 0xe
  299 0005 13       		.uleb128 0x13
  300 0006 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 7
+
+
  301 0007 03       		.uleb128 0x3
  302 0008 0E       		.uleb128 0xe
  303 0009 1B       		.uleb128 0x1b
@@ -358,9 +381,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  318 0018 3E       		.uleb128 0x3e
  319 0019 0B       		.uleb128 0xb
  320 001a 03       		.uleb128 0x3
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 7
-
-
  321 001b 0E       		.uleb128 0xe
  322 001c 00       		.byte	0
  323 001d 00       		.byte	0
@@ -398,6 +418,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  355 003d 3A       		.uleb128 0x3a
  356 003e 0B       		.uleb128 0xb
  357 003f 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 8
+
+
  358 0040 0B       		.uleb128 0xb
  359 0041 27       		.uleb128 0x27
  360 0042 19       		.uleb128 0x19
@@ -418,9 +441,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  375 0052 06       		.uleb128 0x6
  376 0053 05       		.uleb128 0x5
  377 0054 00       		.byte	0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 8
-
-
  378 0055 03       		.uleb128 0x3
  379 0056 0E       		.uleb128 0xe
  380 0057 3A       		.uleb128 0x3a
@@ -458,6 +478,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  412 0077 49       		.uleb128 0x49
  413 0078 13       		.uleb128 0x13
  414 0079 11       		.uleb128 0x11
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 9
+
+
  415 007a 01       		.uleb128 0x1
  416 007b 12       		.uleb128 0x12
  417 007c 06       		.uleb128 0x6
@@ -478,9 +501,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  432 008c 0B       		.uleb128 0xb
  433 008d 3B       		.uleb128 0x3b
  434 008e 0B       		.uleb128 0xb
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 9
-
-
  435 008f 49       		.uleb128 0x49
  436 0090 13       		.uleb128 0x13
  437 0091 02       		.uleb128 0x2
@@ -518,6 +538,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  469 00b1 3C       		.uleb128 0x3c
  470 00b2 19       		.uleb128 0x19
  471 00b3 00       		.byte	0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 10
+
+
  472 00b4 00       		.byte	0
  473 00b5 0C       		.uleb128 0xc
  474 00b6 35       		.uleb128 0x35
@@ -538,9 +561,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  489 000f 0E000000 		.4byte	.LFE63
  490 0013 0400     		.2byte	0x4
  491 0015 F3       		.byte	0xf3
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 10
-
-
  492 0016 01       		.uleb128 0x1
  493 0017 50       		.byte	0x50
  494 0018 9F       		.byte	0x9f
@@ -578,6 +598,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  526 0070 0100     		.2byte	0x1
  527 0072 52       		.byte	0x52
  528 0073 13000000 		.4byte	.LVL5-1
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 11
+
+
  529 0077 4A000000 		.4byte	.LFE64
  530 007b 0100     		.2byte	0x1
  531 007d 54       		.byte	0x54
@@ -598,9 +621,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  546 0000 24000000 		.4byte	0x24
  547 0004 0200     		.2byte	0x2
  548 0006 00000000 		.4byte	.Ldebug_info0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 11
-
-
  549 000a 04       		.byte	0x4
  550 000b 00       		.byte	0
  551 000c 0000     		.2byte	0
@@ -638,6 +658,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  575 0014 5F5F696E 		.ascii	"__int32_t\000"
  575      7433325F 
  575      7400
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 12
+
+
  576              	.LASF16:
  577 001e 646F7562 		.ascii	"double\000"
  577      6C6500
@@ -658,9 +681,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  583              	.LASF1:
  584 006d 756E7369 		.ascii	"unsigned char\000"
  584      676E6564 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 12
-
-
  584      20636861 
  584      7200
  585              	.LASF23:
@@ -698,6 +718,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  595              	.LASF20:
  596 0136 52696768 		.ascii	"RightAdjust\000"
  596      7441646A 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 13
+
+
  596      75737400 
  597              	.LASF8:
  598 0142 6C6F6E67 		.ascii	"long unsigned int\000"
@@ -718,9 +741,6 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  603              	.LASF10:
  604 016f 6C6F6E67 		.ascii	"long long unsigned int\000"
  604      206C6F6E 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 13
-
-
  604      6720756E 
  604      7369676E 
  604      65642069 
@@ -758,6 +778,9 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccW8oyzF.s 			page 1
  622      20646F75 
  622      626C6500 
  623              	.LASF0:
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccOmQXjp.s 			page 14
+
+
  624 01d9 7369676E 		.ascii	"signed char\000"
  624      65642063 
  624      68617200 

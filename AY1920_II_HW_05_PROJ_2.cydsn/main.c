@@ -1,15 +1,12 @@
 /**
-* \brief Main source file for the I2C-Master project.
+* Main source file for the I2C-Master project.
 *
 * In this main code file there is the set up of a I2C master device
-* and communicate with the I2C Slave device (LIS3DH Accelerometer).
+* and the communication with the I2C Slave device (LIS3DH Accelerometer).
 *
-* \author Manuel Carzaniga 
-* \date , 2020
 */
 
 // Include required header files
-
 #include "InterruptRoutines.h"
 #include "stdio.h"
 
@@ -18,7 +15,6 @@ int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
 
-    /* Place your initialization/startup code here (e.g. MyInst_Start()) */
     I2C_Peripheral_Start();
     UART_Debug_Start();
     
@@ -183,18 +179,17 @@ int main(void)
     }
     
     
-    //Start timer and custom ISR in order to start reading from the IMU
-    //after the initialization of the registers
+    // Start timer and custom ISR in order to start reading from the IMU after the initialization of the registers
     Timer_ISR_Start();
     ISR_IMU_StartEx(Custom_ISR_IMU);
    
-    
+    // Initialize the header and tail only once in the data buffer to be sent over UART
     dataBuffer[0] = HEADER;
     dataBuffer[TRANSMIT_BUFFER_SIZE -1] = TAIL;
     
     for(;;)
     {
-       //Endless loop
+       // Endless loop
     }
 }
 

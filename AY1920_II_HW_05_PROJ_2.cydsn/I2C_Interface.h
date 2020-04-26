@@ -1,13 +1,9 @@
 /** 
- * \file I2C_Interface.h
- * \brief Hardware specific I2C interface.
+ * Hardware specific I2C interface.
  *
- * This is an interface to the I2C peripheral. If you need to port 
- * this C-code to another platform, you could simply replace this
- * interface and still use the code.
+ * This is an interface to the I2C peripheral. There are basic function
+ * and registers address declaration.
  *
- * \author Davide Marzorati
- * \date September 12, 2019
 */
 
 #ifndef I2C_Interface_H
@@ -38,7 +34,7 @@
     #define LIS3DH_CTRL_REG1 0x20
 
     /**
-    *   \brief Hex value to set normal mode to the accelerator and 100HZ data rate
+    *   \brief Hex value to set normal mode to the accelerator and 100Hz data rate
     */
     #define LIS3DH_NORMAL_MODE_CTRL_REG1 0x57
 
@@ -53,29 +49,19 @@
     #define LIS3DH_CTRL_REG4_BDU_ACTIVE 0x80
     
     /**
-    *   \brief Address of the X axis output LSB register
+    *   \brief Address of the X axis output low register
     */
     #define LIS3DH_OUT_X_L 0x28
     
     /**
-    *   \brief Address of the Y axis output LSB register
-    */
-    #define LIS3DH_OUT_Y_L 0x2A
-    
-    /**
-    *   \brief Address of the Z axis output LSB register
-    */
-    #define LIS3DH_OUT_Z_L 0x2C
-    
-    /**
-    *   \brief Number of registers to be read/write with the appropriate functions
+    *   \brief Number of registers to be read with the appropriate functions
     */
     #define REGISTER_COUNT 6
     
     /**
     *   \brief Mask for the status register in order to check if data available
     */
-    #define STATUS_REG_MASK 0x08 // 00001000 mask
+    #define STATUS_REG_MASK 0x08 // 0b00001000 mask
 
     
     /** \brief Start the I2C peripheral.
