@@ -1,0 +1,1101 @@
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"InterruptRoutines.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_i2f
+  20              		.section	.text.Custom_ISR_IMU,"ax",%progbits
+  21              		.align	2
+  22              		.global	Custom_ISR_IMU
+  23              		.thumb
+  24              		.thumb_func
+  25              		.type	Custom_ISR_IMU, %function
+  26              	Custom_ISR_IMU:
+  27              	.LFB63:
+  28              		.file 1 "InterruptRoutines.c"
+   1:InterruptRoutines.c **** /* ===========================================================
+   2:InterruptRoutines.c ****  *
+   3:InterruptRoutines.c ****  * In this file there is the functioning of the
+   4:InterruptRoutines.c ****  * ISR for the reading of the 3 values of acceleration @100Hz 
+   5:InterruptRoutines.c ****  *
+   6:InterruptRoutines.c ****  * ==========================================================
+   7:InterruptRoutines.c **** */
+   8:InterruptRoutines.c **** #include "InterruptRoutines.h"
+   9:InterruptRoutines.c **** #include "DataConversion.h"
+  10:InterruptRoutines.c **** 
+  11:InterruptRoutines.c **** ErrorCode error; // Store the occurence of an error during the I2C reading
+  12:InterruptRoutines.c **** 
+  13:InterruptRoutines.c **** uint8_t status_register; // Store the value of the status register
+  14:InterruptRoutines.c **** 
+  15:InterruptRoutines.c **** uint8_t tmpBuffer[BYTE_TO_SEND]; // Temporary buffer to store the read values from the 6 registers
+  16:InterruptRoutines.c **** int16_t tmpAxis; // Temporary value to store the actual axis value
+  17:InterruptRoutines.c **** 
+  18:InterruptRoutines.c **** uint8_t register_block; // Variable used to cycle over the 3 axis registers[low + high at the same 
+  19:InterruptRoutines.c **** 
+  20:InterruptRoutines.c **** float tmpFloat; // Temporary float value to keep the decimals
+  21:InterruptRoutines.c **** 
+  22:InterruptRoutines.c **** uint8_t *addressFloat; // Pointer varialble to store the address of the temporary float variable
+  23:InterruptRoutines.c ****  
+  24:InterruptRoutines.c **** CY_ISR(Custom_ISR_IMU)
+  25:InterruptRoutines.c **** {
+  29              		.loc 1 25 0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 2
+
+
+  33 0000 70B5     		push	{r4, r5, r6, lr}
+  34              		.cfi_def_cfa_offset 16
+  35              		.cfi_offset 4, -16
+  36              		.cfi_offset 5, -12
+  37              		.cfi_offset 6, -8
+  38              		.cfi_offset 14, -4
+  39 0002 82B0     		sub	sp, sp, #8
+  40              		.cfi_def_cfa_offset 24
+  26:InterruptRoutines.c ****     // Read Timer status register to bring interrupt line low
+  27:InterruptRoutines.c ****     Timer_ISR_ReadStatusRegister();
+  41              		.loc 1 27 0
+  42 0004 FFF7FEFF 		bl	Timer_ISR_ReadStatusRegister
+  43              	.LVL0:
+  28:InterruptRoutines.c ****     
+  29:InterruptRoutines.c ****     // Read the status register in order to verify the readyness of the XYZ data
+  30:InterruptRoutines.c ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+  44              		.loc 1 30 0
+  45 0008 274A     		ldr	r2, .L6
+  46 000a 2721     		movs	r1, #39
+  47 000c 1820     		movs	r0, #24
+  48 000e FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
+  49              	.LVL1:
+  50 0012 264B     		ldr	r3, .L6+4
+  51 0014 1870     		strb	r0, [r3]
+  31:InterruptRoutines.c ****                                         LIS3DH_STATUS_REG,
+  32:InterruptRoutines.c ****                                         &status_register);
+  33:InterruptRoutines.c ****     
+  34:InterruptRoutines.c ****     if (error == NO_ERROR)
+  52              		.loc 1 34 0
+  53 0016 0028     		cmp	r0, #0
+  54 0018 43D1     		bne	.L1
+  35:InterruptRoutines.c ****     {
+  36:InterruptRoutines.c ****         /*  Bitwise mask to check only if the 'ZYXDA' bit in the register is '1', so if there are n
+  37:InterruptRoutines.c ****             |X X X X X X X X| & |0 0 0 0 1 0 0 0|  --> |0 0 0 0 X 0 0 0|   check if 'X' is '1' afte
+  38:InterruptRoutines.c ****         */
+  39:InterruptRoutines.c ****         if((status_register & STATUS_REG_MASK) == STATUS_REG_MASK)
+  55              		.loc 1 39 0
+  56 001a 234B     		ldr	r3, .L6
+  57 001c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  58 001e 13F0080F 		tst	r3, #8
+  59 0022 3ED0     		beq	.L1
+  40:InterruptRoutines.c ****         {  
+  41:InterruptRoutines.c ****             // Read in sequence the 6 registers containing the 3-axis values with a multiRead funct
+  42:InterruptRoutines.c ****             error = I2C_Peripheral_ReadRegisterMulti(LIS3DH_DEVICE_ADDRESS,
+  60              		.loc 1 42 0
+  61 0024 224B     		ldr	r3, .L6+8
+  62 0026 0622     		movs	r2, #6
+  63 0028 2821     		movs	r1, #40
+  64 002a 1820     		movs	r0, #24
+  65 002c FFF7FEFF 		bl	I2C_Peripheral_ReadRegisterMulti
+  66              	.LVL2:
+  67 0030 1E4B     		ldr	r3, .L6+4
+  68 0032 1870     		strb	r0, [r3]
+  43:InterruptRoutines.c ****                                                      LIS3DH_OUT_X_L,
+  44:InterruptRoutines.c ****                                                      REGISTER_COUNT,
+  45:InterruptRoutines.c ****                                                      tmpBuffer);
+  46:InterruptRoutines.c ****             if (error == NO_ERROR)
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 3
+
+
+  69              		.loc 1 46 0
+  70 0034 0028     		cmp	r0, #0
+  71 0036 34D1     		bne	.L1
+  47:InterruptRoutines.c ****             {
+  48:InterruptRoutines.c ****                 // Loop through the X, Y, Z register block stored in the tmpBuffer
+  49:InterruptRoutines.c ****                 for(register_block = 0; register_block < 3; register_block++)
+  72              		.loc 1 49 0
+  73 0038 0022     		movs	r2, #0
+  74 003a 1E4B     		ldr	r3, .L6+12
+  75 003c 1A70     		strb	r2, [r3]
+  76 003e 28E0     		b	.L3
+  77              	.L4:
+  50:InterruptRoutines.c ****                 {
+  51:InterruptRoutines.c ****                     // Adjust and scale the data read previously in the registers, return a tempora
+  52:InterruptRoutines.c ****                     tmpAxis = RightAdjust(&tmpBuffer[register_block * 2]); // Pass the appropriate 
+  78              		.loc 1 52 0 discriminator 3
+  79 0040 1B48     		ldr	r0, .L6+8
+  80 0042 00EB4300 		add	r0, r0, r3, lsl #1
+  81 0046 FFF7FEFF 		bl	RightAdjust
+  82              	.LVL3:
+  83 004a 1B4B     		ldr	r3, .L6+16
+  84 004c 1880     		strh	r0, [r3]	@ movhi
+  53:InterruptRoutines.c ****                     
+  54:InterruptRoutines.c ****                     // Casting tmpAxis (int6_t) to a float in this scale of values [+-2048] doesn't
+  55:InterruptRoutines.c ****                     tmpFloat = MinMaxScaler(MIN_OLD_SCALE, MAX_OLD_SCALE, MIN_NEW_SCALE * GRAVITY, 
+  85              		.loc 1 55 0 discriminator 3
+  86 004e FFF7FEFF 		bl	__aeabi_i2f
+  87              	.LVL4:
+  88 0052 0090     		str	r0, [sp]	@ float
+  89 0054 194B     		ldr	r3, .L6+20
+  90 0056 1A4A     		ldr	r2, .L6+24
+  91 0058 4FF08A41 		mov	r1, #1157627904
+  92 005c 4FF04540 		mov	r0, #-989855744
+  93 0060 FFF7FEFF 		bl	MinMaxScaler
+  94              	.LVL5:
+  95 0064 174B     		ldr	r3, .L6+28
+  96 0066 1860     		str	r0, [r3]	@ float
+  56:InterruptRoutines.c ****                     
+  57:InterruptRoutines.c ****                     // Save the address of the float value in a uint8_t pointer
+  58:InterruptRoutines.c ****                     addressFloat = (uint8_t *) &tmpFloat;
+  59:InterruptRoutines.c ****                     
+  60:InterruptRoutines.c ****                     // Insert the correct values in the appropriate position [from 1 to 12 of the b
+  61:InterruptRoutines.c ****                     // increment the addressFloat in order to point at the next 8 bit of the float 
+  62:InterruptRoutines.c ****                     dataBuffer[register_block*4 + 1] = *addressFloat++;
+  97              		.loc 1 62 0 discriminator 3
+  98 0068 124C     		ldr	r4, .L6+12
+  99 006a 2278     		ldrb	r2, [r4]	@ zero_extendqisi2
+ 100 006c 9100     		lsls	r1, r2, #2
+ 101 006e 4D1C     		adds	r5, r1, #1
+ 102 0070 1E78     		ldrb	r6, [r3]	@ zero_extendqisi2
+ 103 0072 1548     		ldr	r0, .L6+32
+ 104 0074 4655     		strb	r6, [r0, r5]
+  63:InterruptRoutines.c ****                     dataBuffer[register_block*4 + 2] = *addressFloat++;
+ 105              		.loc 1 63 0 discriminator 3
+ 106 0076 8D1C     		adds	r5, r1, #2
+ 107 0078 5E78     		ldrb	r6, [r3, #1]	@ zero_extendqisi2
+ 108 007a 4655     		strb	r6, [r0, r5]
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 4
+
+
+  64:InterruptRoutines.c ****                     dataBuffer[register_block*4 + 3] = *addressFloat++;
+ 109              		.loc 1 64 0 discriminator 3
+ 110 007c 0331     		adds	r1, r1, #3
+ 111 007e DE1C     		adds	r6, r3, #3
+ 112 0080 124D     		ldr	r5, .L6+36
+ 113 0082 2E60     		str	r6, [r5]
+ 114 0084 9D78     		ldrb	r5, [r3, #2]	@ zero_extendqisi2
+ 115 0086 4554     		strb	r5, [r0, r1]
+  65:InterruptRoutines.c ****                     dataBuffer[register_block*4 + 4] = *addressFloat; // already the last byte poin
+ 116              		.loc 1 65 0 discriminator 3
+ 117 0088 0132     		adds	r2, r2, #1
+ 118 008a DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 119 008c 00F82230 		strb	r3, [r0, r2, lsl #2]
+  49:InterruptRoutines.c ****                 {
+ 120              		.loc 1 49 0 discriminator 3
+ 121 0090 2270     		strb	r2, [r4]
+ 122              	.L3:
+  49:InterruptRoutines.c ****                 {
+ 123              		.loc 1 49 0 is_stmt 0 discriminator 1
+ 124 0092 084B     		ldr	r3, .L6+12
+ 125 0094 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 126 0096 022B     		cmp	r3, #2
+ 127 0098 D2D9     		bls	.L4
+  66:InterruptRoutines.c ****                 }
+  67:InterruptRoutines.c ****                 
+  68:InterruptRoutines.c ****                 // Send the data packet over UART
+  69:InterruptRoutines.c ****                 UART_Debug_PutArray(dataBuffer, TRANSMIT_BUFFER_SIZE);
+ 128              		.loc 1 69 0 is_stmt 1
+ 129 009a 0E21     		movs	r1, #14
+ 130 009c 0A48     		ldr	r0, .L6+32
+ 131 009e FFF7FEFF 		bl	UART_Debug_PutArray
+ 132              	.LVL6:
+ 133              	.L1:
+  70:InterruptRoutines.c ****             }
+  71:InterruptRoutines.c ****         }
+  72:InterruptRoutines.c ****     }
+  73:InterruptRoutines.c **** }
+ 134              		.loc 1 73 0
+ 135 00a2 02B0     		add	sp, sp, #8
+ 136              		.cfi_def_cfa_offset 16
+ 137              		@ sp needed
+ 138 00a4 70BD     		pop	{r4, r5, r6, pc}
+ 139              	.L7:
+ 140 00a6 00BF     		.align	2
+ 141              	.L6:
+ 142 00a8 00000000 		.word	status_register
+ 143 00ac 00000000 		.word	error
+ 144 00b0 00000000 		.word	tmpBuffer
+ 145 00b4 00000000 		.word	register_block
+ 146 00b8 00000000 		.word	tmpAxis
+ 147 00bc C3F51C42 		.word	1109194179
+ 148 00c0 C3F51CC2 		.word	-1038289469
+ 149 00c4 00000000 		.word	tmpFloat
+ 150 00c8 00000000 		.word	dataBuffer
+ 151 00cc 00000000 		.word	addressFloat
+ 152              		.cfi_endproc
+ 153              	.LFE63:
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 5
+
+
+ 154              		.size	Custom_ISR_IMU, .-Custom_ISR_IMU
+ 155              		.comm	addressFloat,4,4
+ 156              		.comm	tmpFloat,4,4
+ 157              		.comm	register_block,1,1
+ 158              		.comm	tmpAxis,2,2
+ 159              		.comm	tmpBuffer,12,4
+ 160              		.comm	status_register,1,1
+ 161              		.comm	error,1,1
+ 162              		.comm	ready,1,1
+ 163              		.comm	dataBuffer,14,4
+ 164              		.text
+ 165              	.Letext0:
+ 166              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 167              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 168              		.file 4 "ErrorCodes.h"
+ 169              		.file 5 "Generated_Source\\PSoC5/core_cm3.h"
+ 170              		.file 6 "InterruptRoutines.h"
+ 171              		.file 7 "Generated_Source\\PSoC5/Timer_ISR.h"
+ 172              		.file 8 "I2C_Interface.h"
+ 173              		.file 9 "DataConversion.h"
+ 174              		.file 10 "Generated_Source\\PSoC5/UART_Debug.h"
+ 175              		.section	.debug_info,"",%progbits
+ 176              	.Ldebug_info0:
+ 177 0000 9A020000 		.4byte	0x29a
+ 178 0004 0400     		.2byte	0x4
+ 179 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 180 000a 04       		.byte	0x4
+ 181 000b 01       		.uleb128 0x1
+ 182 000c D7000000 		.4byte	.LASF39
+ 183 0010 0C       		.byte	0xc
+ 184 0011 CB020000 		.4byte	.LASF40
+ 185 0015 74000000 		.4byte	.LASF41
+ 186 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 187 001d 00000000 		.4byte	0
+ 188 0021 00000000 		.4byte	.Ldebug_line0
+ 189 0025 02       		.uleb128 0x2
+ 190 0026 01       		.byte	0x1
+ 191 0027 06       		.byte	0x6
+ 192 0028 BF020000 		.4byte	.LASF0
+ 193 002c 03       		.uleb128 0x3
+ 194 002d 00000000 		.4byte	.LASF2
+ 195 0031 02       		.byte	0x2
+ 196 0032 1D       		.byte	0x1d
+ 197 0033 37000000 		.4byte	0x37
+ 198 0037 02       		.uleb128 0x2
+ 199 0038 01       		.byte	0x1
+ 200 0039 08       		.byte	0x8
+ 201 003a C9000000 		.4byte	.LASF1
+ 202 003e 03       		.uleb128 0x3
+ 203 003f 19000000 		.4byte	.LASF3
+ 204 0043 02       		.byte	0x2
+ 205 0044 29       		.byte	0x29
+ 206 0045 49000000 		.4byte	0x49
+ 207 0049 02       		.uleb128 0x2
+ 208 004a 02       		.byte	0x2
+ 209 004b 05       		.byte	0x5
+ 210 004c 92020000 		.4byte	.LASF4
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 6
+
+
+ 211 0050 02       		.uleb128 0x2
+ 212 0051 02       		.byte	0x2
+ 213 0052 07       		.byte	0x7
+ 214 0053 78010000 		.4byte	.LASF5
+ 215 0057 03       		.uleb128 0x3
+ 216 0058 33000000 		.4byte	.LASF6
+ 217 005c 02       		.byte	0x2
+ 218 005d 3F       		.byte	0x3f
+ 219 005e 62000000 		.4byte	0x62
+ 220 0062 02       		.uleb128 0x2
+ 221 0063 04       		.byte	0x4
+ 222 0064 05       		.byte	0x5
+ 223 0065 3D000000 		.4byte	.LASF7
+ 224 0069 02       		.uleb128 0x2
+ 225 006a 04       		.byte	0x4
+ 226 006b 07       		.byte	0x7
+ 227 006c A4010000 		.4byte	.LASF8
+ 228 0070 02       		.uleb128 0x2
+ 229 0071 08       		.byte	0x8
+ 230 0072 05       		.byte	0x5
+ 231 0073 54020000 		.4byte	.LASF9
+ 232 0077 02       		.uleb128 0x2
+ 233 0078 08       		.byte	0x8
+ 234 0079 07       		.byte	0x7
+ 235 007a EF010000 		.4byte	.LASF10
+ 236 007e 04       		.uleb128 0x4
+ 237 007f 04       		.byte	0x4
+ 238 0080 05       		.byte	0x5
+ 239 0081 696E7400 		.ascii	"int\000"
+ 240 0085 02       		.uleb128 0x2
+ 241 0086 04       		.byte	0x4
+ 242 0087 07       		.byte	0x7
+ 243 0088 E2010000 		.4byte	.LASF11
+ 244 008c 03       		.uleb128 0x3
+ 245 008d 06020000 		.4byte	.LASF12
+ 246 0091 03       		.byte	0x3
+ 247 0092 18       		.byte	0x18
+ 248 0093 2C000000 		.4byte	0x2c
+ 249 0097 03       		.uleb128 0x3
+ 250 0098 18020000 		.4byte	.LASF13
+ 251 009c 03       		.byte	0x3
+ 252 009d 20       		.byte	0x20
+ 253 009e 3E000000 		.4byte	0x3e
+ 254 00a2 03       		.uleb128 0x3
+ 255 00a3 3D020000 		.4byte	.LASF14
+ 256 00a7 03       		.byte	0x3
+ 257 00a8 2C       		.byte	0x2c
+ 258 00a9 57000000 		.4byte	0x57
+ 259 00ad 02       		.uleb128 0x2
+ 260 00ae 04       		.byte	0x4
+ 261 00af 04       		.byte	0x4
+ 262 00b0 C3000000 		.4byte	.LASF15
+ 263 00b4 02       		.uleb128 0x2
+ 264 00b5 08       		.byte	0x8
+ 265 00b6 04       		.byte	0x4
+ 266 00b7 64000000 		.4byte	.LASF16
+ 267 00bb 02       		.uleb128 0x2
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 7
+
+
+ 268 00bc 01       		.byte	0x1
+ 269 00bd 08       		.byte	0x8
+ 270 00be 62020000 		.4byte	.LASF17
+ 271 00c2 05       		.uleb128 0x5
+ 272 00c3 01       		.byte	0x1
+ 273 00c4 37000000 		.4byte	0x37
+ 274 00c8 04       		.byte	0x4
+ 275 00c9 15       		.byte	0x15
+ 276 00ca DB000000 		.4byte	0xdb
+ 277 00ce 06       		.uleb128 0x6
+ 278 00cf 9C020000 		.4byte	.LASF18
+ 279 00d3 00       		.byte	0
+ 280 00d4 06       		.uleb128 0x6
+ 281 00d5 A5020000 		.4byte	.LASF19
+ 282 00d9 01       		.byte	0x1
+ 283 00da 00       		.byte	0
+ 284 00db 03       		.uleb128 0x3
+ 285 00dc 5A000000 		.4byte	.LASF20
+ 286 00e0 04       		.byte	0x4
+ 287 00e1 18       		.byte	0x18
+ 288 00e2 C2000000 		.4byte	0xc2
+ 289 00e6 02       		.uleb128 0x2
+ 290 00e7 08       		.byte	0x8
+ 291 00e8 04       		.byte	0x4
+ 292 00e9 B3020000 		.4byte	.LASF21
+ 293 00ed 02       		.uleb128 0x2
+ 294 00ee 04       		.byte	0x4
+ 295 00ef 07       		.byte	0x7
+ 296 00f0 45020000 		.4byte	.LASF22
+ 297 00f4 07       		.uleb128 0x7
+ 298 00f5 8C000000 		.4byte	0x8c
+ 299 00f9 08       		.uleb128 0x8
+ 300 00fa 67020000 		.4byte	.LASF42
+ 301 00fe 01       		.byte	0x1
+ 302 00ff 18       		.byte	0x18
+ 303 0100 00000000 		.4byte	.LFB63
+ 304 0104 D0000000 		.4byte	.LFE63-.LFB63
+ 305 0108 01       		.uleb128 0x1
+ 306 0109 9C       		.byte	0x9c
+ 307 010a 8B010000 		.4byte	0x18b
+ 308 010e 09       		.uleb128 0x9
+ 309 010f 08000000 		.4byte	.LVL0
+ 310 0113 5B020000 		.4byte	0x25b
+ 311 0117 0A       		.uleb128 0xa
+ 312 0118 12000000 		.4byte	.LVL1
+ 313 011c 66020000 		.4byte	0x266
+ 314 0120 39010000 		.4byte	0x139
+ 315 0124 0B       		.uleb128 0xb
+ 316 0125 01       		.uleb128 0x1
+ 317 0126 50       		.byte	0x50
+ 318 0127 01       		.uleb128 0x1
+ 319 0128 48       		.byte	0x48
+ 320 0129 0B       		.uleb128 0xb
+ 321 012a 01       		.uleb128 0x1
+ 322 012b 51       		.byte	0x51
+ 323 012c 02       		.uleb128 0x2
+ 324 012d 08       		.byte	0x8
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 8
+
+
+ 325 012e 27       		.byte	0x27
+ 326 012f 0B       		.uleb128 0xb
+ 327 0130 01       		.uleb128 0x1
+ 328 0131 52       		.byte	0x52
+ 329 0132 05       		.uleb128 0x5
+ 330 0133 03       		.byte	0x3
+ 331 0134 00000000 		.4byte	status_register
+ 332 0138 00       		.byte	0
+ 333 0139 0A       		.uleb128 0xa
+ 334 013a 30000000 		.4byte	.LVL2
+ 335 013e 71020000 		.4byte	0x271
+ 336 0142 60010000 		.4byte	0x160
+ 337 0146 0B       		.uleb128 0xb
+ 338 0147 01       		.uleb128 0x1
+ 339 0148 50       		.byte	0x50
+ 340 0149 01       		.uleb128 0x1
+ 341 014a 48       		.byte	0x48
+ 342 014b 0B       		.uleb128 0xb
+ 343 014c 01       		.uleb128 0x1
+ 344 014d 51       		.byte	0x51
+ 345 014e 02       		.uleb128 0x2
+ 346 014f 08       		.byte	0x8
+ 347 0150 28       		.byte	0x28
+ 348 0151 0B       		.uleb128 0xb
+ 349 0152 01       		.uleb128 0x1
+ 350 0153 52       		.byte	0x52
+ 351 0154 01       		.uleb128 0x1
+ 352 0155 36       		.byte	0x36
+ 353 0156 0B       		.uleb128 0xb
+ 354 0157 01       		.uleb128 0x1
+ 355 0158 53       		.byte	0x53
+ 356 0159 05       		.uleb128 0x5
+ 357 015a 03       		.byte	0x3
+ 358 015b 00000000 		.4byte	tmpBuffer
+ 359 015f 00       		.byte	0
+ 360 0160 09       		.uleb128 0x9
+ 361 0161 4A000000 		.4byte	.LVL3
+ 362 0165 7C020000 		.4byte	0x27c
+ 363 0169 09       		.uleb128 0x9
+ 364 016a 64000000 		.4byte	.LVL5
+ 365 016e 87020000 		.4byte	0x287
+ 366 0172 0C       		.uleb128 0xc
+ 367 0173 A2000000 		.4byte	.LVL6
+ 368 0177 92020000 		.4byte	0x292
+ 369 017b 0B       		.uleb128 0xb
+ 370 017c 01       		.uleb128 0x1
+ 371 017d 50       		.byte	0x50
+ 372 017e 05       		.uleb128 0x5
+ 373 017f 03       		.byte	0x3
+ 374 0180 00000000 		.4byte	dataBuffer
+ 375 0184 0B       		.uleb128 0xb
+ 376 0185 01       		.uleb128 0x1
+ 377 0186 51       		.byte	0x51
+ 378 0187 01       		.uleb128 0x1
+ 379 0188 3E       		.byte	0x3e
+ 380 0189 00       		.byte	0
+ 381 018a 00       		.byte	0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 9
+
+
+ 382 018b 0D       		.uleb128 0xd
+ 383 018c 8B010000 		.4byte	.LASF23
+ 384 0190 05       		.byte	0x5
+ 385 0191 1207     		.2byte	0x712
+ 386 0193 97010000 		.4byte	0x197
+ 387 0197 07       		.uleb128 0x7
+ 388 0198 A2000000 		.4byte	0xa2
+ 389 019c 0E       		.uleb128 0xe
+ 390 019d 8C000000 		.4byte	0x8c
+ 391 01a1 AC010000 		.4byte	0x1ac
+ 392 01a5 0F       		.uleb128 0xf
+ 393 01a6 ED000000 		.4byte	0xed
+ 394 01aa 0D       		.byte	0xd
+ 395 01ab 00       		.byte	0
+ 396 01ac 10       		.uleb128 0x10
+ 397 01ad D7010000 		.4byte	.LASF24
+ 398 01b1 06       		.byte	0x6
+ 399 01b2 15       		.byte	0x15
+ 400 01b3 9C010000 		.4byte	0x19c
+ 401 01b7 05       		.uleb128 0x5
+ 402 01b8 03       		.byte	0x3
+ 403 01b9 00000000 		.4byte	dataBuffer
+ 404 01bd 10       		.uleb128 0x10
+ 405 01be 65010000 		.4byte	.LASF25
+ 406 01c2 06       		.byte	0x6
+ 407 01c3 17       		.byte	0x17
+ 408 01c4 F4000000 		.4byte	0xf4
+ 409 01c8 05       		.uleb128 0x5
+ 410 01c9 03       		.byte	0x3
+ 411 01ca 00000000 		.4byte	ready
+ 412 01ce 10       		.uleb128 0x10
+ 413 01cf 4E020000 		.4byte	.LASF26
+ 414 01d3 01       		.byte	0x1
+ 415 01d4 0B       		.byte	0xb
+ 416 01d5 DB000000 		.4byte	0xdb
+ 417 01d9 05       		.uleb128 0x5
+ 418 01da 03       		.byte	0x3
+ 419 01db 00000000 		.4byte	error
+ 420 01df 10       		.uleb128 0x10
+ 421 01e0 23000000 		.4byte	.LASF27
+ 422 01e4 01       		.byte	0x1
+ 423 01e5 0D       		.byte	0xd
+ 424 01e6 8C000000 		.4byte	0x8c
+ 425 01ea 05       		.uleb128 0x5
+ 426 01eb 03       		.byte	0x3
+ 427 01ec 00000000 		.4byte	status_register
+ 428 01f0 0E       		.uleb128 0xe
+ 429 01f1 8C000000 		.4byte	0x8c
+ 430 01f5 00020000 		.4byte	0x200
+ 431 01f9 0F       		.uleb128 0xf
+ 432 01fa ED000000 		.4byte	0xed
+ 433 01fe 0B       		.byte	0xb
+ 434 01ff 00       		.byte	0
+ 435 0200 10       		.uleb128 0x10
+ 436 0201 0E020000 		.4byte	.LASF28
+ 437 0205 01       		.byte	0x1
+ 438 0206 0F       		.byte	0xf
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 10
+
+
+ 439 0207 F0010000 		.4byte	0x1f0
+ 440 020b 05       		.uleb128 0x5
+ 441 020c 03       		.byte	0x3
+ 442 020d 00000000 		.4byte	tmpBuffer
+ 443 0211 10       		.uleb128 0x10
+ 444 0212 AB020000 		.4byte	.LASF29
+ 445 0216 01       		.byte	0x1
+ 446 0217 10       		.byte	0x10
+ 447 0218 97000000 		.4byte	0x97
+ 448 021c 05       		.uleb128 0x5
+ 449 021d 03       		.byte	0x3
+ 450 021e 00000000 		.4byte	tmpAxis
+ 451 0222 10       		.uleb128 0x10
+ 452 0223 0A000000 		.4byte	.LASF30
+ 453 0227 01       		.byte	0x1
+ 454 0228 12       		.byte	0x12
+ 455 0229 8C000000 		.4byte	0x8c
+ 456 022d 05       		.uleb128 0x5
+ 457 022e 03       		.byte	0x3
+ 458 022f 00000000 		.4byte	register_block
+ 459 0233 10       		.uleb128 0x10
+ 460 0234 6B000000 		.4byte	.LASF31
+ 461 0238 01       		.byte	0x1
+ 462 0239 14       		.byte	0x14
+ 463 023a AD000000 		.4byte	0xad
+ 464 023e 05       		.uleb128 0x5
+ 465 023f 03       		.byte	0x3
+ 466 0240 00000000 		.4byte	tmpFloat
+ 467 0244 10       		.uleb128 0x10
+ 468 0245 B6000000 		.4byte	.LASF32
+ 469 0249 01       		.byte	0x1
+ 470 024a 16       		.byte	0x16
+ 471 024b 55020000 		.4byte	0x255
+ 472 024f 05       		.uleb128 0x5
+ 473 0250 03       		.byte	0x3
+ 474 0251 00000000 		.4byte	addressFloat
+ 475 0255 11       		.uleb128 0x11
+ 476 0256 04       		.byte	0x4
+ 477 0257 8C000000 		.4byte	0x8c
+ 478 025b 12       		.uleb128 0x12
+ 479 025c 20020000 		.4byte	.LASF33
+ 480 0260 20020000 		.4byte	.LASF33
+ 481 0264 07       		.byte	0x7
+ 482 0265 5E       		.byte	0x5e
+ 483 0266 12       		.uleb128 0x12
+ 484 0267 76020000 		.4byte	.LASF34
+ 485 026b 76020000 		.4byte	.LASF34
+ 486 026f 08       		.byte	0x8
+ 487 0270 58       		.byte	0x58
+ 488 0271 12       		.uleb128 0x12
+ 489 0272 B6010000 		.4byte	.LASF35
+ 490 0276 B6010000 		.4byte	.LASF35
+ 491 027a 08       		.byte	0x8
+ 492 027b 66       		.byte	0x66
+ 493 027c 12       		.uleb128 0x12
+ 494 027d 98010000 		.4byte	.LASF36
+ 495 0281 98010000 		.4byte	.LASF36
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 11
+
+
+ 496 0285 09       		.byte	0x9
+ 497 0286 1A       		.byte	0x1a
+ 498 0287 12       		.uleb128 0x12
+ 499 0288 6B010000 		.4byte	.LASF37
+ 500 028c 6B010000 		.4byte	.LASF37
+ 501 0290 09       		.byte	0x9
+ 502 0291 1B       		.byte	0x1b
+ 503 0292 12       		.uleb128 0x12
+ 504 0293 46000000 		.4byte	.LASF38
+ 505 0297 46000000 		.4byte	.LASF38
+ 506 029b 0A       		.byte	0xa
+ 507 029c 8C       		.byte	0x8c
+ 508 029d 00       		.byte	0
+ 509              		.section	.debug_abbrev,"",%progbits
+ 510              	.Ldebug_abbrev0:
+ 511 0000 01       		.uleb128 0x1
+ 512 0001 11       		.uleb128 0x11
+ 513 0002 01       		.byte	0x1
+ 514 0003 25       		.uleb128 0x25
+ 515 0004 0E       		.uleb128 0xe
+ 516 0005 13       		.uleb128 0x13
+ 517 0006 0B       		.uleb128 0xb
+ 518 0007 03       		.uleb128 0x3
+ 519 0008 0E       		.uleb128 0xe
+ 520 0009 1B       		.uleb128 0x1b
+ 521 000a 0E       		.uleb128 0xe
+ 522 000b 55       		.uleb128 0x55
+ 523 000c 17       		.uleb128 0x17
+ 524 000d 11       		.uleb128 0x11
+ 525 000e 01       		.uleb128 0x1
+ 526 000f 10       		.uleb128 0x10
+ 527 0010 17       		.uleb128 0x17
+ 528 0011 00       		.byte	0
+ 529 0012 00       		.byte	0
+ 530 0013 02       		.uleb128 0x2
+ 531 0014 24       		.uleb128 0x24
+ 532 0015 00       		.byte	0
+ 533 0016 0B       		.uleb128 0xb
+ 534 0017 0B       		.uleb128 0xb
+ 535 0018 3E       		.uleb128 0x3e
+ 536 0019 0B       		.uleb128 0xb
+ 537 001a 03       		.uleb128 0x3
+ 538 001b 0E       		.uleb128 0xe
+ 539 001c 00       		.byte	0
+ 540 001d 00       		.byte	0
+ 541 001e 03       		.uleb128 0x3
+ 542 001f 16       		.uleb128 0x16
+ 543 0020 00       		.byte	0
+ 544 0021 03       		.uleb128 0x3
+ 545 0022 0E       		.uleb128 0xe
+ 546 0023 3A       		.uleb128 0x3a
+ 547 0024 0B       		.uleb128 0xb
+ 548 0025 3B       		.uleb128 0x3b
+ 549 0026 0B       		.uleb128 0xb
+ 550 0027 49       		.uleb128 0x49
+ 551 0028 13       		.uleb128 0x13
+ 552 0029 00       		.byte	0
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 12
+
+
+ 553 002a 00       		.byte	0
+ 554 002b 04       		.uleb128 0x4
+ 555 002c 24       		.uleb128 0x24
+ 556 002d 00       		.byte	0
+ 557 002e 0B       		.uleb128 0xb
+ 558 002f 0B       		.uleb128 0xb
+ 559 0030 3E       		.uleb128 0x3e
+ 560 0031 0B       		.uleb128 0xb
+ 561 0032 03       		.uleb128 0x3
+ 562 0033 08       		.uleb128 0x8
+ 563 0034 00       		.byte	0
+ 564 0035 00       		.byte	0
+ 565 0036 05       		.uleb128 0x5
+ 566 0037 04       		.uleb128 0x4
+ 567 0038 01       		.byte	0x1
+ 568 0039 0B       		.uleb128 0xb
+ 569 003a 0B       		.uleb128 0xb
+ 570 003b 49       		.uleb128 0x49
+ 571 003c 13       		.uleb128 0x13
+ 572 003d 3A       		.uleb128 0x3a
+ 573 003e 0B       		.uleb128 0xb
+ 574 003f 3B       		.uleb128 0x3b
+ 575 0040 0B       		.uleb128 0xb
+ 576 0041 01       		.uleb128 0x1
+ 577 0042 13       		.uleb128 0x13
+ 578 0043 00       		.byte	0
+ 579 0044 00       		.byte	0
+ 580 0045 06       		.uleb128 0x6
+ 581 0046 28       		.uleb128 0x28
+ 582 0047 00       		.byte	0
+ 583 0048 03       		.uleb128 0x3
+ 584 0049 0E       		.uleb128 0xe
+ 585 004a 1C       		.uleb128 0x1c
+ 586 004b 0B       		.uleb128 0xb
+ 587 004c 00       		.byte	0
+ 588 004d 00       		.byte	0
+ 589 004e 07       		.uleb128 0x7
+ 590 004f 35       		.uleb128 0x35
+ 591 0050 00       		.byte	0
+ 592 0051 49       		.uleb128 0x49
+ 593 0052 13       		.uleb128 0x13
+ 594 0053 00       		.byte	0
+ 595 0054 00       		.byte	0
+ 596 0055 08       		.uleb128 0x8
+ 597 0056 2E       		.uleb128 0x2e
+ 598 0057 01       		.byte	0x1
+ 599 0058 3F       		.uleb128 0x3f
+ 600 0059 19       		.uleb128 0x19
+ 601 005a 03       		.uleb128 0x3
+ 602 005b 0E       		.uleb128 0xe
+ 603 005c 3A       		.uleb128 0x3a
+ 604 005d 0B       		.uleb128 0xb
+ 605 005e 3B       		.uleb128 0x3b
+ 606 005f 0B       		.uleb128 0xb
+ 607 0060 27       		.uleb128 0x27
+ 608 0061 19       		.uleb128 0x19
+ 609 0062 11       		.uleb128 0x11
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 13
+
+
+ 610 0063 01       		.uleb128 0x1
+ 611 0064 12       		.uleb128 0x12
+ 612 0065 06       		.uleb128 0x6
+ 613 0066 40       		.uleb128 0x40
+ 614 0067 18       		.uleb128 0x18
+ 615 0068 9642     		.uleb128 0x2116
+ 616 006a 19       		.uleb128 0x19
+ 617 006b 01       		.uleb128 0x1
+ 618 006c 13       		.uleb128 0x13
+ 619 006d 00       		.byte	0
+ 620 006e 00       		.byte	0
+ 621 006f 09       		.uleb128 0x9
+ 622 0070 898201   		.uleb128 0x4109
+ 623 0073 00       		.byte	0
+ 624 0074 11       		.uleb128 0x11
+ 625 0075 01       		.uleb128 0x1
+ 626 0076 31       		.uleb128 0x31
+ 627 0077 13       		.uleb128 0x13
+ 628 0078 00       		.byte	0
+ 629 0079 00       		.byte	0
+ 630 007a 0A       		.uleb128 0xa
+ 631 007b 898201   		.uleb128 0x4109
+ 632 007e 01       		.byte	0x1
+ 633 007f 11       		.uleb128 0x11
+ 634 0080 01       		.uleb128 0x1
+ 635 0081 31       		.uleb128 0x31
+ 636 0082 13       		.uleb128 0x13
+ 637 0083 01       		.uleb128 0x1
+ 638 0084 13       		.uleb128 0x13
+ 639 0085 00       		.byte	0
+ 640 0086 00       		.byte	0
+ 641 0087 0B       		.uleb128 0xb
+ 642 0088 8A8201   		.uleb128 0x410a
+ 643 008b 00       		.byte	0
+ 644 008c 02       		.uleb128 0x2
+ 645 008d 18       		.uleb128 0x18
+ 646 008e 9142     		.uleb128 0x2111
+ 647 0090 18       		.uleb128 0x18
+ 648 0091 00       		.byte	0
+ 649 0092 00       		.byte	0
+ 650 0093 0C       		.uleb128 0xc
+ 651 0094 898201   		.uleb128 0x4109
+ 652 0097 01       		.byte	0x1
+ 653 0098 11       		.uleb128 0x11
+ 654 0099 01       		.uleb128 0x1
+ 655 009a 31       		.uleb128 0x31
+ 656 009b 13       		.uleb128 0x13
+ 657 009c 00       		.byte	0
+ 658 009d 00       		.byte	0
+ 659 009e 0D       		.uleb128 0xd
+ 660 009f 34       		.uleb128 0x34
+ 661 00a0 00       		.byte	0
+ 662 00a1 03       		.uleb128 0x3
+ 663 00a2 0E       		.uleb128 0xe
+ 664 00a3 3A       		.uleb128 0x3a
+ 665 00a4 0B       		.uleb128 0xb
+ 666 00a5 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 14
+
+
+ 667 00a6 05       		.uleb128 0x5
+ 668 00a7 49       		.uleb128 0x49
+ 669 00a8 13       		.uleb128 0x13
+ 670 00a9 3F       		.uleb128 0x3f
+ 671 00aa 19       		.uleb128 0x19
+ 672 00ab 3C       		.uleb128 0x3c
+ 673 00ac 19       		.uleb128 0x19
+ 674 00ad 00       		.byte	0
+ 675 00ae 00       		.byte	0
+ 676 00af 0E       		.uleb128 0xe
+ 677 00b0 01       		.uleb128 0x1
+ 678 00b1 01       		.byte	0x1
+ 679 00b2 49       		.uleb128 0x49
+ 680 00b3 13       		.uleb128 0x13
+ 681 00b4 01       		.uleb128 0x1
+ 682 00b5 13       		.uleb128 0x13
+ 683 00b6 00       		.byte	0
+ 684 00b7 00       		.byte	0
+ 685 00b8 0F       		.uleb128 0xf
+ 686 00b9 21       		.uleb128 0x21
+ 687 00ba 00       		.byte	0
+ 688 00bb 49       		.uleb128 0x49
+ 689 00bc 13       		.uleb128 0x13
+ 690 00bd 2F       		.uleb128 0x2f
+ 691 00be 0B       		.uleb128 0xb
+ 692 00bf 00       		.byte	0
+ 693 00c0 00       		.byte	0
+ 694 00c1 10       		.uleb128 0x10
+ 695 00c2 34       		.uleb128 0x34
+ 696 00c3 00       		.byte	0
+ 697 00c4 03       		.uleb128 0x3
+ 698 00c5 0E       		.uleb128 0xe
+ 699 00c6 3A       		.uleb128 0x3a
+ 700 00c7 0B       		.uleb128 0xb
+ 701 00c8 3B       		.uleb128 0x3b
+ 702 00c9 0B       		.uleb128 0xb
+ 703 00ca 49       		.uleb128 0x49
+ 704 00cb 13       		.uleb128 0x13
+ 705 00cc 3F       		.uleb128 0x3f
+ 706 00cd 19       		.uleb128 0x19
+ 707 00ce 02       		.uleb128 0x2
+ 708 00cf 18       		.uleb128 0x18
+ 709 00d0 00       		.byte	0
+ 710 00d1 00       		.byte	0
+ 711 00d2 11       		.uleb128 0x11
+ 712 00d3 0F       		.uleb128 0xf
+ 713 00d4 00       		.byte	0
+ 714 00d5 0B       		.uleb128 0xb
+ 715 00d6 0B       		.uleb128 0xb
+ 716 00d7 49       		.uleb128 0x49
+ 717 00d8 13       		.uleb128 0x13
+ 718 00d9 00       		.byte	0
+ 719 00da 00       		.byte	0
+ 720 00db 12       		.uleb128 0x12
+ 721 00dc 2E       		.uleb128 0x2e
+ 722 00dd 00       		.byte	0
+ 723 00de 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 15
+
+
+ 724 00df 19       		.uleb128 0x19
+ 725 00e0 3C       		.uleb128 0x3c
+ 726 00e1 19       		.uleb128 0x19
+ 727 00e2 6E       		.uleb128 0x6e
+ 728 00e3 0E       		.uleb128 0xe
+ 729 00e4 03       		.uleb128 0x3
+ 730 00e5 0E       		.uleb128 0xe
+ 731 00e6 3A       		.uleb128 0x3a
+ 732 00e7 0B       		.uleb128 0xb
+ 733 00e8 3B       		.uleb128 0x3b
+ 734 00e9 0B       		.uleb128 0xb
+ 735 00ea 00       		.byte	0
+ 736 00eb 00       		.byte	0
+ 737 00ec 00       		.byte	0
+ 738              		.section	.debug_aranges,"",%progbits
+ 739 0000 1C000000 		.4byte	0x1c
+ 740 0004 0200     		.2byte	0x2
+ 741 0006 00000000 		.4byte	.Ldebug_info0
+ 742 000a 04       		.byte	0x4
+ 743 000b 00       		.byte	0
+ 744 000c 0000     		.2byte	0
+ 745 000e 0000     		.2byte	0
+ 746 0010 00000000 		.4byte	.LFB63
+ 747 0014 D0000000 		.4byte	.LFE63-.LFB63
+ 748 0018 00000000 		.4byte	0
+ 749 001c 00000000 		.4byte	0
+ 750              		.section	.debug_ranges,"",%progbits
+ 751              	.Ldebug_ranges0:
+ 752 0000 00000000 		.4byte	.LFB63
+ 753 0004 D0000000 		.4byte	.LFE63
+ 754 0008 00000000 		.4byte	0
+ 755 000c 00000000 		.4byte	0
+ 756              		.section	.debug_line,"",%progbits
+ 757              	.Ldebug_line0:
+ 758 0000 05020000 		.section	.debug_str,"MS",%progbits,1
+ 758      0200B901 
+ 758      00000201 
+ 758      FB0E0D00 
+ 758      01010101 
+ 759              	.LASF2:
+ 760 0000 5F5F7569 		.ascii	"__uint8_t\000"
+ 760      6E74385F 
+ 760      7400
+ 761              	.LASF30:
+ 762 000a 72656769 		.ascii	"register_block\000"
+ 762      73746572 
+ 762      5F626C6F 
+ 762      636B00
+ 763              	.LASF3:
+ 764 0019 5F5F696E 		.ascii	"__int16_t\000"
+ 764      7431365F 
+ 764      7400
+ 765              	.LASF27:
+ 766 0023 73746174 		.ascii	"status_register\000"
+ 766      75735F72 
+ 766      65676973 
+ 766      74657200 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 16
+
+
+ 767              	.LASF6:
+ 768 0033 5F5F696E 		.ascii	"__int32_t\000"
+ 768      7433325F 
+ 768      7400
+ 769              	.LASF7:
+ 770 003d 6C6F6E67 		.ascii	"long int\000"
+ 770      20696E74 
+ 770      00
+ 771              	.LASF38:
+ 772 0046 55415254 		.ascii	"UART_Debug_PutArray\000"
+ 772      5F446562 
+ 772      75675F50 
+ 772      75744172 
+ 772      72617900 
+ 773              	.LASF20:
+ 774 005a 4572726F 		.ascii	"ErrorCode\000"
+ 774      72436F64 
+ 774      6500
+ 775              	.LASF16:
+ 776 0064 646F7562 		.ascii	"double\000"
+ 776      6C6500
+ 777              	.LASF31:
+ 778 006b 746D7046 		.ascii	"tmpFloat\000"
+ 778      6C6F6174 
+ 778      00
+ 779              	.LASF41:
+ 780 0074 433A5C55 		.ascii	"C:\\Users\\Manu\\Desktop\\git_ps\\PSoC_03\\AY1920_I"
+ 780      73657273 
+ 780      5C4D616E 
+ 780      755C4465 
+ 780      736B746F 
+ 781 00a1 495F4857 		.ascii	"I_HW_05_PROJ_3.cydsn\000"
+ 781      5F30355F 
+ 781      50524F4A 
+ 781      5F332E63 
+ 781      7964736E 
+ 782              	.LASF32:
+ 783 00b6 61646472 		.ascii	"addressFloat\000"
+ 783      65737346 
+ 783      6C6F6174 
+ 783      00
+ 784              	.LASF15:
+ 785 00c3 666C6F61 		.ascii	"float\000"
+ 785      7400
+ 786              	.LASF1:
+ 787 00c9 756E7369 		.ascii	"unsigned char\000"
+ 787      676E6564 
+ 787      20636861 
+ 787      7200
+ 788              	.LASF39:
+ 789 00d7 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 789      43313120 
+ 789      352E342E 
+ 789      31203230 
+ 789      31363036 
+ 790 010a 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 790      20726576 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 17
+
+
+ 790      6973696F 
+ 790      6E203233 
+ 790      37373135 
+ 791 013d 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 791      66756E63 
+ 791      74696F6E 
+ 791      2D736563 
+ 791      74696F6E 
+ 792              	.LASF25:
+ 793 0165 72656164 		.ascii	"ready\000"
+ 793      7900
+ 794              	.LASF37:
+ 795 016b 4D696E4D 		.ascii	"MinMaxScaler\000"
+ 795      61785363 
+ 795      616C6572 
+ 795      00
+ 796              	.LASF5:
+ 797 0178 73686F72 		.ascii	"short unsigned int\000"
+ 797      7420756E 
+ 797      7369676E 
+ 797      65642069 
+ 797      6E7400
+ 798              	.LASF23:
+ 799 018b 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 799      52784275 
+ 799      66666572 
+ 799      00
+ 800              	.LASF36:
+ 801 0198 52696768 		.ascii	"RightAdjust\000"
+ 801      7441646A 
+ 801      75737400 
+ 802              	.LASF8:
+ 803 01a4 6C6F6E67 		.ascii	"long unsigned int\000"
+ 803      20756E73 
+ 803      69676E65 
+ 803      6420696E 
+ 803      7400
+ 804              	.LASF35:
+ 805 01b6 4932435F 		.ascii	"I2C_Peripheral_ReadRegisterMulti\000"
+ 805      50657269 
+ 805      70686572 
+ 805      616C5F52 
+ 805      65616452 
+ 806              	.LASF24:
+ 807 01d7 64617461 		.ascii	"dataBuffer\000"
+ 807      42756666 
+ 807      657200
+ 808              	.LASF11:
+ 809 01e2 756E7369 		.ascii	"unsigned int\000"
+ 809      676E6564 
+ 809      20696E74 
+ 809      00
+ 810              	.LASF10:
+ 811 01ef 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 811      206C6F6E 
+ 811      6720756E 
+ 811      7369676E 
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 18
+
+
+ 811      65642069 
+ 812              	.LASF12:
+ 813 0206 75696E74 		.ascii	"uint8_t\000"
+ 813      385F7400 
+ 814              	.LASF28:
+ 815 020e 746D7042 		.ascii	"tmpBuffer\000"
+ 815      75666665 
+ 815      7200
+ 816              	.LASF13:
+ 817 0218 696E7431 		.ascii	"int16_t\000"
+ 817      365F7400 
+ 818              	.LASF33:
+ 819 0220 54696D65 		.ascii	"Timer_ISR_ReadStatusRegister\000"
+ 819      725F4953 
+ 819      525F5265 
+ 819      61645374 
+ 819      61747573 
+ 820              	.LASF14:
+ 821 023d 696E7433 		.ascii	"int32_t\000"
+ 821      325F7400 
+ 822              	.LASF22:
+ 823 0245 73697A65 		.ascii	"sizetype\000"
+ 823      74797065 
+ 823      00
+ 824              	.LASF26:
+ 825 024e 6572726F 		.ascii	"error\000"
+ 825      7200
+ 826              	.LASF9:
+ 827 0254 6C6F6E67 		.ascii	"long long int\000"
+ 827      206C6F6E 
+ 827      6720696E 
+ 827      7400
+ 828              	.LASF17:
+ 829 0262 63686172 		.ascii	"char\000"
+ 829      00
+ 830              	.LASF42:
+ 831 0267 43757374 		.ascii	"Custom_ISR_IMU\000"
+ 831      6F6D5F49 
+ 831      53525F49 
+ 831      4D5500
+ 832              	.LASF34:
+ 833 0276 4932435F 		.ascii	"I2C_Peripheral_ReadRegister\000"
+ 833      50657269 
+ 833      70686572 
+ 833      616C5F52 
+ 833      65616452 
+ 834              	.LASF4:
+ 835 0292 73686F72 		.ascii	"short int\000"
+ 835      7420696E 
+ 835      7400
+ 836              	.LASF18:
+ 837 029c 4E4F5F45 		.ascii	"NO_ERROR\000"
+ 837      52524F52 
+ 837      00
+ 838              	.LASF19:
+ 839 02a5 4552524F 		.ascii	"ERROR\000"
+ 839      5200
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccuQldOs.s 			page 19
+
+
+ 840              	.LASF29:
+ 841 02ab 746D7041 		.ascii	"tmpAxis\000"
+ 841      78697300 
+ 842              	.LASF21:
+ 843 02b3 6C6F6E67 		.ascii	"long double\000"
+ 843      20646F75 
+ 843      626C6500 
+ 844              	.LASF0:
+ 845 02bf 7369676E 		.ascii	"signed char\000"
+ 845      65642063 
+ 845      68617200 
+ 846              	.LASF40:
+ 847 02cb 496E7465 		.ascii	"InterruptRoutines.c\000"
+ 847      72727570 
+ 847      74526F75 
+ 847      74696E65 
+ 847      732E6300 
+ 848              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

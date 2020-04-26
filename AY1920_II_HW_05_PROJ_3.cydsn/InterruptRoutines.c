@@ -17,6 +17,10 @@ int16_t tmpAxis; // Temporary value to store the actual axis value
 
 uint8_t register_block; // Variable used to cycle over the 3 axis registers[low + high at the same time]
 
+float tmpFloat; // Temporary float value to keep the decimals of the read acceleration
+
+uint8_t *addressFloat; // Pointer variable to store the address of the temporary float variable
+ 
 CY_ISR(Custom_ISR_IMU)
 {
     // Read Timer status register to bring interrupt line low
@@ -44,13 +48,21 @@ CY_ISR(Custom_ISR_IMU)
                 // Loop through the X, Y, Z register block stored in the tmpBuffer
                 for(register_block = 0; register_block < 3; register_block++)
                 {
-                    // Adjust and scale the data read previously in the registers
+                    // Adjust and scale the data read previously in the registers, return a temporary float
                     tmpAxis = RightAdjust(&tmpBuffer[register_block * 2]); // Pass the appropriate address cell to the function
-                    tmpAxis = MinMaxScaler(MIN_OLD_SCALE, MAX_OLD_SCALE, MIN_NEW_SCALE, MAX_NEW_SCALE, tmpAxis);
                     
-                    // Insert the correct values in the appropriate position [from 1 to 6 of the bufffer]
-                    dataBuffer[register_block*2 + 1] = (uint8_t)(tmpAxis & 0xFF);
-                    dataBuffer[register_block*2 + 2] = (uint8_t)(tmpAxis >> 8); 
+                    // Casting tmpAxis (int6_t) to a float in this scale of values [+-2048] doesn't lost numerical information
+                    tmpFloat = MinMaxScaler(MIN_OLD_SCALE, MAX_OLD_SCALE, MIN_NEW_SCALE * GRAVITY, MAX_NEW_SCALE * GRAVITY, (float)tmpAxis);
+                    
+                    // Save the address of the float value in a uint8_t pointer
+                    addressFloat = (uint8_t *) &tmpFloat;
+                    
+                    // Insert the correct values in the appropriate position [from 1 to 12 of the buffer]
+                    // increment the addressFloat in order to point at the next 8 bit of the float variable
+                    dataBuffer[register_block*4 + 1] = *addressFloat++;
+                    dataBuffer[register_block*4 + 2] = *addressFloat++;
+                    dataBuffer[register_block*4 + 3] = *addressFloat++;
+                    dataBuffer[register_block*4 + 4] = *addressFloat; // already the last byte pointed, no need to increment more
                 }
                 
                 // Send the data packet over UART

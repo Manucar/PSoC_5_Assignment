@@ -20,7 +20,6 @@
     
     uint8_t dataBuffer[TRANSMIT_BUFFER_SIZE]; // Final buffer with the 3-axis data from the IMU
 
-    volatile uint8_t ready;
     CY_ISR_PROTO(Custom_ISR_IMU); // Custom ISR function prototype definition
     
  #endif

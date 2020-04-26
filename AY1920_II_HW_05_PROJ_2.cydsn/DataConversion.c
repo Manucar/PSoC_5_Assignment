@@ -29,7 +29,7 @@ int16_t RightAdjust(uint8_t *arrayToAdjust)
 
 /*  Scale the old range in the new range of 'mg' through a MinMaxScaler
 
-    Actually the old range is from -512 to 511 [is a 10bit integet, and the '0' is considered in the positive part], but
+    Actually the old range is from -512 to 511 [is a 10bit integer, and the '0' is considered in the positive part], but
     to keep the '0' from the old scale in '0' to the new scale, -512 to 512 scale range was adopted,
     accepting the fact of losing some values in the positive new range (1996 instead of 2000) but this
     doesn't affect the measurement.
