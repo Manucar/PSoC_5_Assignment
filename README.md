@@ -2,15 +2,18 @@
 # Electronic Technologies and Biosensors Laboratory
 ### A.Y. 2019/2020 – II Semester
 
-![](https://upload.wikimedia.org/wikipedia/it/archive/b/be/20151105101950%21Logo_Politecnico_Milano.png)
+<p align="center">
+   <a href="url"><img src="https://upload.wikimedia.org/wikipedia/it/archive/b/be/20151105101950%21Logo_Politecnico_Milano.png" height="50%" width="50%"></a>
+</p>
+
 
 ## ASSIGNMENT 05
 ### PSoC I2C
-1. Objective
+1. **Objective**: 
 In this assignment you are required to create 3 projects within a single workspace using PSoC Creator and the CY8CKIT-059 KIT along with the following components:
     * LIS3DH 3-Axis Accelerometer breakout board
 
-2. Context
+2. **Context**:
 * 2.1. Project 1 Implementing multiread and multiwrite functions
     * 2.1.1. Start from the final example (PSoC_03_Complete.zip) regarding the temperature sensor on the breakout board
     * 2.1.2. Add implementation of multiread and multiwrite functions in the I2C_Interface.c source file
