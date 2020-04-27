@@ -22,14 +22,14 @@ CY_ISR(Custom_ISR_IMU)
     // Read Timer status register to bring interrupt line low
     Timer_ISR_ReadStatusRegister();
     
-    // Read the status register in order to verify the readyness of the XYZ data
+    // Read the status register in order to verify the readiness of the XYZ data
     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
                                         LIS3DH_STATUS_REG,
                                         &status_register);
     
     if (error == NO_ERROR)
     {
-        /*  Bitwise mask to check only if the 'ZYXDA' bit in the register is '1', so if there are new available data
+        /*  Bitwise mask to check only if the 'ZYXDA' bit in the status register is '1', so if there are new available data
             |X X X X X X X X| & |0 0 0 0 1 0 0 0|  --> |0 0 0 0 X 0 0 0|   check if 'X' is '1' after masking
         */
         if((status_register & STATUS_REG_MASK) == STATUS_REG_MASK)
@@ -46,15 +46,16 @@ CY_ISR(Custom_ISR_IMU)
                 {
                     // Adjust and scale the data read previously in the registers
                     tmpAxis = RightAdjust(&tmpBuffer[register_block * 2]); // Pass the appropriate address cell to the function
-                    tmpAxis = MinMaxScaler(MIN_OLD_SCALE, MAX_OLD_SCALE, MIN_NEW_SCALE, MAX_NEW_SCALE, tmpAxis);
+                    
+                    // Casting tmpAxis from int6_t to a float in this scale of values [+-512] doesn't lost numerical information
+                    tmpAxis = MinMaxScaler(MIN_OLD_SCALE, MAX_OLD_SCALE, MIN_NEW_SCALE, MAX_NEW_SCALE, (float)tmpAxis);
                     
                     // Insert the correct values in the appropriate position [from 1 to 6 of the bufffer]
                     dataBuffer[register_block*2 + 1] = (uint8_t)(tmpAxis & 0xFF);
                     dataBuffer[register_block*2 + 2] = (uint8_t)(tmpAxis >> 8); 
                 }
                 
-                // Send the data packet over UART
-                UART_Debug_PutArray(dataBuffer, TRANSMIT_BUFFER_SIZE);
+                PacketReadyFlag = 1;  // Packet is complete and ready to be sent
             }
         }
     }

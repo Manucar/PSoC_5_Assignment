@@ -44,7 +44,7 @@
     #define LIS3DH_CTRL_REG4 0x23
     
     /**
-    *   \brief Hex value to set output registers not updated until MSB and LSB reading and FSR +-4g and enable high mode
+    *   \brief Hex value to set output registers not updated until MSB and LSB reading, FSR +-4g and enable high mode
     */
     #define LIS3DH_CTRL_REG4_BDU_ACTIVE 0x98
     
@@ -54,7 +54,7 @@
     #define LIS3DH_OUT_X_L 0x28
     
     /**
-    *   \brief Number of registers to be read with the appropriate functions
+    *   \brief Number of registers to be read with the appropriate function
     */
     #define REGISTER_COUNT 6
     

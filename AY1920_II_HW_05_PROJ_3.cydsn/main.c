@@ -178,6 +178,7 @@ int main(void)
         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
     }
     
+    PacketReadyFlag = 0; // Initialize flag to 0 --> no packet ready to send
     
     // Start timer and custom ISR in order to start reading from the IMU after the initialization of the registers
     Timer_ISR_Start();
@@ -189,7 +190,13 @@ int main(void)
     
     for(;;)
     {
-       // Endless loop
+       // Check if a packet is arrived
+        if(PacketReadyFlag == 1)
+        {
+            // Send out the data via UART
+            UART_Debug_PutArray(dataBuffer, TRANSMIT_BUFFER_SIZE);
+            PacketReadyFlag = 0;  // Reset the flag, waitinig for the next packet
+        }
     }
 }
 

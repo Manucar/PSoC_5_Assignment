@@ -10,7 +10,7 @@
     #include "project.h"
     
     #define REGISTER_SIZE 8 // Register size in bit
-    #define SHIFT_SIZE 6 // Shift size according to the resolution chosen
+    #define SHIFT_SIZE 6 // Shift size according to the resolution chosen [Normal mode]
     
     // Range of the old scale, 10 bit signed integer --> 1 bit for the sign and so
     // 9 bits remained for the representable number(512)

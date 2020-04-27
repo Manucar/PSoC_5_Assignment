@@ -1,6 +1,7 @@
 /* =========================================================
  * 
  * The following functions are used for the data conversion
+ * and bit manipulation.
  *
  * =========================================================
 */
@@ -34,7 +35,7 @@ int16_t RightAdjust(uint8_t *arrayToAdjust)
     accepting the fact of losing some values in the positive new range (1996 instead of 2000) but this
     doesn't affect the measurement.
 
-    All variables are taken as float for doing the correct operations and then casted to int6_t for the return value.
+    All variables are taken as float for executing the correct operations and then casted to int6_t for the return value.
 */
 int16_t MinMaxScaler(float min, float max, float a, float b, float x)
 {   
