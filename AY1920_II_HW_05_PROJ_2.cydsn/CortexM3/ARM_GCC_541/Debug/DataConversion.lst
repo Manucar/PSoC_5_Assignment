@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 1
 
 
    1              		.syntax unified
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 0
   31              		@ frame_needed = 0, uses_anonymous_args = 0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 2
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 2
 
 
   32              		@ link register save eliminated.
@@ -98,7 +98,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
   35:DataConversion.c ****     accepting the fact of losing some values in the positive new range (1996 instead of 2000) but t
   36:DataConversion.c ****     doesn't affect the measurement.
   37:DataConversion.c **** 
-  38:DataConversion.c ****     All variables are taken as float for doing the correct operations and then casted to int6_t for
+  38:DataConversion.c ****     All variables are taken as float for executing the correct operations and then casted to int6_t
   39:DataConversion.c **** */
   40:DataConversion.c **** int16_t MinMaxScaler(float min, float max, float a, float b, float x)
   41:DataConversion.c **** {   
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
   71 0004 0546     		mov	r5, r0
   72 0006 0F46     		mov	r7, r1
   73 0008 1446     		mov	r4, r2
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 3
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 3
 
 
   74 000a 9846     		mov	r8, r3
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  126 0011 E5010000 		.4byte	.LASF24
  127 0015 25000000 		.4byte	.LASF25
  128 0019 00000000 		.4byte	.Ldebug_ranges0+0
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 4
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 4
 
 
  129 001d 00000000 		.4byte	0
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  183 0086 04       		.byte	0x4
  184 0087 07       		.byte	0x7
  185 0088 62010000 		.4byte	.LASF11
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 5
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 5
 
 
  186 008c 03       		.uleb128 0x3
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  240 00fb 8C000000 		.4byte	0x8c
  241 00ff 08       		.uleb128 0x8
  242 0100 09010000 		.4byte	.LASF21
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 6
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 6
 
 
  243 0104 01       		.byte	0x1
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  297 0003 25       		.uleb128 0x25
  298 0004 0E       		.uleb128 0xe
  299 0005 13       		.uleb128 0x13
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 7
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 7
 
 
  300 0006 0B       		.uleb128 0xb
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  354 003c 0E       		.uleb128 0xe
  355 003d 3A       		.uleb128 0x3a
  356 003e 0B       		.uleb128 0xb
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 8
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 8
 
 
  357 003f 3B       		.uleb128 0x3b
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  411 0076 19       		.uleb128 0x19
  412 0077 49       		.uleb128 0x49
  413 0078 13       		.uleb128 0x13
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 9
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 9
 
 
  414 0079 11       		.uleb128 0x11
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  468 00b0 19       		.uleb128 0x19
  469 00b1 3C       		.uleb128 0x3c
  470 00b2 19       		.uleb128 0x19
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 10
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 10
 
 
  471 00b3 00       		.byte	0
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  525 006c 13000000 		.4byte	.LVL5-1
  526 0070 0100     		.2byte	0x1
  527 0072 52       		.byte	0x52
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 11
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 11
 
 
  528 0073 13000000 		.4byte	.LVL5-1
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  574              	.LASF6:
  575 0014 5F5F696E 		.ascii	"__int32_t\000"
  575      7433325F 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 12
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 12
 
 
  575      7400
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  594      00
  595              	.LASF20:
  596 0136 52696768 		.ascii	"RightAdjust\000"
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 13
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 13
 
 
  596      7441646A 
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 1
  622 01cd 6C6F6E67 		.ascii	"long double\000"
  622      20646F75 
  622      626C6500 
-ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccFMboN3.s 			page 14
+ARM GAS  C:\Users\Manu\AppData\Local\Temp\ccNTpxLb.s 			page 14
 
 
  623              	.LASF0:

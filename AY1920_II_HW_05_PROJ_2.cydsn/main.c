@@ -176,7 +176,8 @@ int main(void)
     else
     {
         UART_Debug_PutString("Error occurred during I2C comm to read control register4\r\n");   
-    }
+    } 
+    
     
     PacketReadyFlag = 0; // Initialize flag to 0 --> no packet ready to send
     
